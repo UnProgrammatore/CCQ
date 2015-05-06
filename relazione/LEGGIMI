@@ -1,0 +1,21 @@
+NOTE SULLA COMPILAZIONE:
+
+per avere il documento completo anche del frontespizio
+fare in sequenza questi 3 comandi:
+
+$ pdflatex main.tex
+
+$ pdflatex main-frn.tex
+
+$ pdflatex main.tex
+
+in seguito, se non è stata apportata nessuna modifica 
+al frontespizio, fare solo:
+
+$ pdflatex main.tex
+
+
+
+Attenzione a non far finire sul repository i file
+autogenerati dalla compilazione (andateci piano col
+git add *).
