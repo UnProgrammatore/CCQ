@@ -1,0 +1,56 @@
+\documentclass[10pt,%                       % corpo del font principale
+               a4paper,%                    % carta A4
+               oneside,%                    % solo fronte
+%              twoside,%                    % fronte-retro
+               ]{article}                   % classe report di KOMA-Script;           
+\usepackage[T1]{fontenc}                    % codifica dei font:
+                                            % NOTA BENE! richiede una distribuzione *completa* di LaTeX,
+                                            % per esempio TeXLive o MiKTeX *complete*
+\usepackage[utf8]{inputenc}                 % codifica di input; anche [latin1] va bene
+                                            % NOTA BENE! va accordata con le preferenze dell'editor
+\usepackage[english,italian]{babel}         % per scrivere in italiano e in inglese;
+                                            % l'ultima lingua (l'italiano) risulta predefinita
+\usepackage[binding=5mm]{layaureo}          % margini ottimizzati per l'A4; rilegatura di 5 mm
+\usepackage{indentfirst}                    % rientra il primo capoverso di ogni sezione
+\usepackage{booktabs}                       % tabelle
+\usepackage{tabularx}                       % tabelle di larghezza prefissata
+\usepackage{graphicx}                       % immagini
+\usepackage{subfig}                         % sottofigure, sottotabelle
+\usepackage{caption}                        % didascalie
+\usepackage{listings}                       % codici
+\usepackage[font=small]{quoting}            % citazioni
+\usepackage{amsmath,amssymb,amsthm}         % matematica
+\usepackage[italian]{varioref}              % riferimenti completi della pagina
+\usepackage{mparhack,fixltx2e,relsize}      % finezze tipografiche
+\usepackage[style=philosophy-modern,hyperref,backref,square,natbib]{biblatex}
+                                            % eccellente pacchetto per la bibliografia;
+                                            % produce uno stile di citazione autore-anno; 
+                                            % lo stile "numeric-comp" produce riferimenti numerici
+\bibliography{Bibliografia}                 % database di biblatex
+\usepackage[dvipsnames]{xcolor}             % colori
+\usepackage{lipsum}                         % testo fittizio
+\usepackage{eurosym}                        % simbolo dell'euro
+\usepackage{hyperref}                       % collegamenti ipertestuali
+\usepackage{bookmark}                       % segnalibri
+\input{impostazioni}               % file con le impostazioni personali
+
+\begin{document}
+\pagestyle{headings} 
+%******************************************************************
+% Materiale iniziale
+%******************************************************************
+\input{materiale_iniziale_finale/frontespizio}
+\input{materiale_iniziale_finale/indici}
+%\input{materiale_iniziale_finale/Sommario+Abstract}
+%******************************************************************
+% Materiale principale
+%******************************************************************
+\input{paragrafi/Lorem}
+\input{paragrafi/Ipsum}
+\appendix
+\input{paragrafi/Dolor}
+% *****************************************************************
+% Materiale finale
+%******************************************************************
+\input{materiale_iniziale_finale/bibliografia}
+\end{document}
