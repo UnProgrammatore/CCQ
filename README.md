@@ -1,0 +1,2 @@
+# CCQ
+Cluster Crivello Quadratico
