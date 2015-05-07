@@ -1,0 +1,25 @@
+introduzione e obiettivi (generali)
+ "Problema della fattorizzazione: algoritmo banale e 'costo',
+  utilità della fattorizzazione (rsa).
+  Crivello quadratico possibilità di parallelizzazione su
+  cluster di computer realizzati secondo modello Beowulf ..."
+spiegazione all'algortimo (seriale)
+  ""
+spiegazione dell'architettura di calcolo distribuito utilizzata
+  - il nostro modello di calcolo parallelo
+    * classificazione del nostro sistema (MIMD a memoria ibrido distribuita)
+      "cos'è mimd, cos'è la memoria ibrida distribuita, cos'è un cluster"
+    * paradigma di programmazione parallela (MPI)
+      "come funziona, alcuni concetti"
+  - tecnologie utilizzate
+    * opem mpi
+      "cos'è il progetto open mpi, perchè l'abbiamo scelto"
+    * eventualmente NFS, boot da rete, script per configurazione ssh ... (se avanza tempo)
+strategia di parallelizzazione dell'algoritmo
+  "studiare quale parte dell'algoritmo può essere paralellizata" 
+realizzazione dell'algoritmo parallelo
+  "scrittura codice delle parte parallelizzate e descrizione"
+?(se è fattibili)considerazioni teoriche sul costo dell'alg parallelo
+risultati e test
+  "sicuramente ci saranno test di costo sperimentale con grafici ecc.."
+sviluppi futuri
