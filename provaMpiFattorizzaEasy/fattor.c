@@ -54,8 +54,8 @@ void slave_procedure(int my_rank, int comm_size, long long the_number) {
 	int shit_happened;
 	struct elem* head = NULL;
 
-	from = (the_number / (2 * comm_size)) * (my_rank - 1);
-	to = (the_number / (2 * comm_size)) * my_rank;
+	from = ((the_number / (2 * comm_size)) + 1) * (my_rank - 1);
+	to = ((the_number / (2 * comm_size)) + 1) * my_rank;
 
 	from = from == 0 ? 1 : from; // Because why not
 
@@ -68,7 +68,7 @@ void slave_procedure(int my_rank, int comm_size, long long the_number) {
 
 	do {
 		to_send = pick(&head);
-		shit_happened = MPI_Send(&to_send, 1, MPI_LONG_LONG, 0, 0, MPI_COMM_WORLD);
+		shit_happened = MPI_Ssend(&to_send, 1, MPI_LONG_LONG, 0, 0, MPI_COMM_WORLD);
 
 		if(shit_happened) {
 			fprintf(stderr, "Send failed");
