@@ -41,7 +41,6 @@ void master_procedure(int comm_size) {
 			MPI_Abort(MPI_COMM_WORLD, 1);
 		}
 
-		//fprintf(stderr, "Received: %lld\n", rec);
 		if(rec == 0)
 			++i;
 		else
@@ -58,12 +57,10 @@ void slave_procedure(int my_rank, int comm_size, long long the_number) {
 	from = (the_number / (2 * comm_size)) * (my_rank - 1);
 	to = (the_number / (2 * comm_size)) * my_rank;
 
-	from = from == 0 ? 1 : from;
+	from = from == 0 ? 1 : from; // Because why not
 
 	while(from < to) {
-		//fprintf(stderr, "Trying: %lld\n", from);
 		if(the_number % from == 0) {
-			//fprintf(stderr, "Found: %lld\n", from);
 			add(&head, from);
 		}
 		++from;
@@ -72,7 +69,6 @@ void slave_procedure(int my_rank, int comm_size, long long the_number) {
 	do {
 		to_send = pick(&head);
 		shit_happened = MPI_Send(&to_send, 1, MPI_LONG_LONG, 0, 0, MPI_COMM_WORLD);
-		//fprintf(stderr, "I'm %d and i'm sending %lld\n", my_rank, to_send);
 
 		if(shit_happened) {
 			fprintf(stderr, "Send failed");
@@ -96,7 +92,6 @@ int main(int argc, char** argv) {
 	}
 	else
 		the_number = atoll(argv[1]);
-	//fprintf(stderr, "the_number is: %lld\n", the_number);
 
 	if(my_rank == 0)
 		master_procedure(comm_size);
