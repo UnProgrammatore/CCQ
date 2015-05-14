@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <omp.h>
 
 struct elem { // Very basic and non-reusable stack
 	long long val;
@@ -55,18 +56,26 @@ void slave_procedure(int my_rank, int comm_size, long long the_number) {
 	int shit_happened;
 	struct elem* head = NULL;
 
-	from = ((((long long int) sqrt((double) the_number)) / (comm_size)) + 1) * (my_rank - 1);
-	to = ((((long long int) sqrt((double) the_number)) / (comm_size)) + 1) * (my_rank); // TODO: better square root
+	from = ((((long long int) sqrt((double) the_number)) / (comm_size - 1))) * (my_rank - 1);
+	to = ((((long long int) sqrt((double) the_number)) / (comm_size - 1)) + 1) * (my_rank); // TODO: better square root
 
 	from = from == 0 ? 1 : from; // Because why not
 
-	for(; from < to; ++from) {
-		if(the_number % from == 0) {
-			add(&head, from);
-			add(&head, the_number / from);
+	long long int i;
+
+	#pragma omp parallel shared(from, to) private(i)
+	{
+		#pragma omp for schedule(auto)
+		for(i = 0; i < (to - from); ++i) {
+			if(the_number % (from + i) == 0) {
+				#pragma omp critical
+				{
+					add(&head, from + i);
+					add(&head, the_number / (from + i));
+				}
+			}
 		}
 	}
-
 	do {
 		to_send = pick(&head);
 		shit_happened = MPI_Ssend(&to_send, 1, MPI_LONG_LONG, 0, 0, MPI_COMM_WORLD);
