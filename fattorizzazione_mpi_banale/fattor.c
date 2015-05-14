@@ -1,6 +1,7 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 struct elem { // Very basic and non-reusable stack
 	long long val;
@@ -54,16 +55,16 @@ void slave_procedure(int my_rank, int comm_size, long long the_number) {
 	int shit_happened;
 	struct elem* head = NULL;
 
-	from = ((the_number / (2 * comm_size)) + 1) * (my_rank - 1);
-	to = ((the_number / (2 * comm_size)) + 1) * my_rank;
+	from = ((((long long int) sqrt((double) the_number)) / (comm_size)) + 1) * (my_rank - 1);
+	to = ((((long long int) sqrt((double) the_number)) / (comm_size)) + 1) * (my_rank); // TODO: better square root
 
 	from = from == 0 ? 1 : from; // Because why not
 
-	while(from < to) {
+	for(; from < to; ++from) {
 		if(the_number % from == 0) {
 			add(&head, from);
+			add(&head, the_number / from);
 		}
-		++from;
 	}
 
 	do {
