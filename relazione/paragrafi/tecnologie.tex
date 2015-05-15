@@ -6,4 +6,26 @@
 \subsection{OpenMPI}
 \label{subsec:openmpi}
 OpenMPI è un'implementazione open source di MPI (\ref{subsec:mpi}).
-Utilizza il protocollo SSH. %Continuare
+È in grado di gestire la comunicazione fra processi con una moltitudine di tecnologie, fra cui TCP per la comunicazione fra processi in esecuzione su macchine facenti parte di una rete di tipo classico, e memoria condivisa per la comunicazione (molto più rapida) fra processi in esecuzione sulla stessa macchina.
+L'esecuzione su macchine multiple è gestita tramite il protocollo SSH: la macchina su cui viene lanciato il processo contatterà le altre tramite protocollo SSH, e lancerà opportunamente il programma richiesto.
+La libreria funziona assumendo che le macchine abbiano un utente con lo stesso nome e con lo stesso contenuto della home (tenterà infatti di contattare tramite SSH la macchina con lo stesso nome utente da cui è stato lanciato il processo, e cercherà l'eseguibile nello stesso path della macchina di orgine).
+Al fine di evitare possibili problemi in questo senso è opportuno utilizzare uno dei tanti sistemi in grado di sincronizzare il contenuto dei dischi, o se possibile montare la home su un file system di rete.
+
+%Aggiungere qui la spiegazione di comunicatori e altre cose del genere
+Di seguito verranno esposte le primitive più importanti della libreria.
+\begin{itemize}
+\item MPI\_Init: Inizializza la libreria, va chiamata prima di utilizzare qualunque altra funzione di MPI.
+\item MPI\_Comm\_size: Ritorna il numero di processi all'interno del comunicatore specificato.
+\item MPI\_Comm\_rank: Ritorna il rank del processo all'interno del comunicatore specificato.
+\item MPI\_Abort: Termina tutti i processi nel comunicatore specificato.
+\item MPI\_Get\_processor: Ritorna il nome del processore che sta eseguendo il processo.
+\item MPI\_Finalize: Finalizza la libreria, dopo questa chiamata non è più possibile utilizzare funzioni di libreria.
+\item MPI\_Send: Send bloccante classica, la funzione ritorna quando il buffer contenente i dati da spedire è riutilizzabile.
+\item MPI\_Recv: Receive bloccante classica, la funzione ritorna quando il buffer contiene i dati ricevuti ed è utilizzabile.
+\item MPI\_Isend: Send non bloccante, ritorna un id della richiesta, utilizzabile per verificare lo stato dell'operazione.
+\item MPI\_Irecv: Receive non bloccante, ritorna un id della richiesta, utilizzabile per verificare lo stato dell'operazione.
+\item MPI\_Test: Controlla se l'operazione richiesta è terminata o meno.
+\item MPI\_Wait: Attende il termine dell'operazione richiesta.
+\item MPI\_Pack e MPI\_Unpack: Impacchettano e spacchettano dati da spedire.
+\end{itemize}
+%Continuare
