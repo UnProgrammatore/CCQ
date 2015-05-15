@@ -1,3 +1,9 @@
+/*****************************************************************************************************************
+* Compiling: mpicc fattor.c -lm -fopenmp -o fattor
+* Running: mpirun -n PROCNUM --bind-to none fattor NUMBER
+* Note: PROCNUM is the number of processes that will be ran, and it must be >=2, NUMBER is the number to factorize
+*****************************************************************************************************************/
+
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
