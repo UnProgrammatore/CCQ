@@ -3,6 +3,72 @@
 \label{sec:introduzione}
 %************************************************
 
+%************************************************
+\section{Introduzione e obiettivi}
+\label{sec:introduzione}
+%************************************************
+
+-sicurezza
+-perchè rsa
+-perchè problema della fattorizzazione
+-perchè quest'algoritmo
+-Obiettivo implementazione
+
+
+-fattorizzazione
+-conseguenze del problema (rsa)
+-sicurezza
+-Rompere rsa ( implementazione parallela qs rsa-challenge)
+-ottimizzazione dell'algoritmo
+		( cluster // uso linux-mpi )
+
+
+Per il teorema fondamentale dell'Arimetica dato un numero N non primo, il quale possiede quindi dei divisori non banali, esiste ed è unica, prescindendo dall'ordine dei fattori, la sua fattorizzazione esprimibile come prodotto di numeri primi elevati ad opportune potenze.
+Il problema della fattorizzazione di numeri interi viene affrontato sin dalle elementari per trovare relazioni tra due numeri quali il massimo comun divisore o il minimo comune multiplo, ognuno di noi ha quindi presente di cosa si tratti, per lo meno ad un livello intuitivo.
+Quando ci si addentra nell'ostico compito di fattorizzare numeri che contengono un numero di cifre nell'ordine delle centinaia il problema si dimostra essere molto più difficile di quanto si potesse pensare analizzandolo in maniera intuitiva.
+Sotto l'aspetto della teoria della complessità computazionale il problema risulta essere esponenziale, subesponenziale nel caso di alcuni algoritmi particolari.
+Sulla difficoltà di questo problema si basa un famosissimo algoritmo di cifratura: RSA.
+
+RSA fa parte di quella branca della crittografia moderna che prende il nome di crittografia asimmetrica.
+A differenza della crittografia classica o simmetrica, quella asimmetrica prevede l'esistenza di due tipi di chiavi, una pubblica ed una privata.
+Questo approccio permette situazioni del seguente tipo:
+\begin{itemize}
+
+
+\item Alice vuole spedire un messaggio a Bob di modo che solo Bob possa leggerlo, userà quindi la chiave pubblica di Bob per cifrare il messaggio sapendo che solo Bob con la sua chiave privata potrà decifrarlo.
+
+\item Alice vuole spedire un messaggio a Bob di modo che, non solo Bob sia l'unico a poterlo leggere, ma che esso abbia la certezza che il mittente del messaggio sia proprio Alice.
+Alice quindi cifra il messaggio con la propria chiave privata e successivamente con quella pubblica di Bob. In questo modo all'atto della ricezione, Bob potrà applicare la propria chiave privata e la chiave pubblica di Alice per poter decifrare il messaggio essendo certo della provenienza dello stesso.
+
+\end{itemize}
+
+Il funzionamento di RSA non è particolarmente complesso.
+Supponiamo che Alice e Bob stiano avendo un dialogo segreto, ossia non vogliono che un eventuale haker possa intercettare la loro comunicazione e comprenderne il significato.
+Sia quindi \textit{M} il messaggio che si vogliono scambiare.
+Ognuno di loro sceglie due numeri primi \textit{p} e \textit{q} li moltiplica tra di loro ottenendo \textit{N=p.q}.
+In seguito calcolano \varphi\left( \textit{N}\right(  = \left( \textit{p-1}\right(\left(\textit{q-1}\right( .
+Scelgono infine un numero \textit{e} coprimo con \varphi\left(\textit{N}\right( e minore dello stesso e calcolano \textit{d} tale per cui \textit{e.d\equiv 1 mod\left(N\right(}.
+Ora \left(\textit{N, e}\right( è la chiave pubblica, mentre quella privata è \left(\textit{N, d}\right(.
+Il messaggio visibile sulla rete è il seguente: \textit{\esp(\textit{M},1)=\exp(M,e)mod\left(N\right(} che verr\'{a} poi decifrato applicando una semplice esponenziazione di esponente \textit{d}, elemento della chiave pubblica del mittente.
+
+La sicurezza di quest'algoritmo risiede nella difficoltà computazionale di fattorizzare il numero \textit{N} nei suoi fattori primi e quindi nel trovare la funzione \varphi\left(\textit{N}\right(
+che permetterebbe di trovare l'inverso moltiplicativo di \textit{e} e quindi rompere i sistema.
+
+Nel 1991 la RSA Laboratories propose come sfida la fattorizzazione di 54 semiprimi ( prodotti di due primi ) con un numero di cifre compreso tra 100 e 617.
+Ad oggi solo i 12 pi\'{u} piccoli sono stati fattorizzati e, nonostante il 2007 vide la chiusura dell'RSA Challenge in molti ancora si dilettano nel tentativo di fattorizzarli.
+
+
+
+
+\lipsum[1]
+
+
+
+
+
+
+
+
 \lipsum[1]
 
 
