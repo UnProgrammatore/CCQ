@@ -9,29 +9,34 @@
 #include <gmp.h>
 
 struct elem { // Very basic and non-reusable stack
-	long long val;
+	mpz_t val;
 	struct elem* next;
 };
 
-void add(struct elem** head, long long val) {
+void add(struct elem** head, mpz_t val) {
 	struct elem* app = malloc(sizeof(struct elem));
-	app->val = val;
+	mpz_init(app->val);
+	mpz_set(app->val, val); // app->val = val;
 	app->next = *head;
 	*head = app;
 }
 
-long long pick(struct elem** head) {
-	long long toret;
+mpz_t pick(struct elem** head) {
+	mpz_t toret;
+	mpz_init(toret);
+
 	struct elem* app;
+	
 	if(*head == NULL)
-		return 0;
+		mpz_set_ui(toret, 0); // toret = 0;
 	else {
-		toret = (*head)->val;
+		mpz_set(toret, (*head)->val); // toret = (*head)->val;
 		app = *head;
 		*head = (*head)->next;
+		mpz_finalize(app->val);
 		free(app);
-		return toret;
 	}
+	return toret;
 }
 
 void master_procedure(int comm_size) {
@@ -67,13 +72,13 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 	mpz_init(from);
 	mpz_init(to);
 
-	mpz_root(temp, the_number, 2);
-	mpz_div_ui(temp, temp, comm_size - 1);
+	mpz_root(temp, the_number, 2); // temp = sqrt(the_number);
+	mpz_div_ui(temp, temp, comm_size - 1); // temp = temp / (comm_size - 1);
 	
-	mpz_mul_ui(from, temp, my_rank - 1);
-	mpz_mul_ui(from, temp, my_rank);	
+	mpz_mul_ui(from, temp, my_rank - 1); // from = temp * (my_rank - 1);
+	mpz_mul_ui(to, temp, my_rank); // to = temp * my_rank;
 
-	mpz_cmp_ui(from, 0) ? : mpz_set_ui(from, 1); // Because why not
+	mpz_cmp_ui(from, 0) ? : mpz_set_ui(from, 1); // from == 0 ? from = 1 : ;
 
 	#pragma omp parallel shared(from, to)
 	{
@@ -82,35 +87,40 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 		
 		mpz_t from_thread;
 		mpz_t to_thread;
-		mpz_t module;
+		mpz_t divided;
 		mpz_init(from_thread);
 		mpz_init(to_thread);
-		mpz_init(module);
+		mpz_init(divided);
 
-		mpz_sub(to_thread, to, from);
-		mpz_set(from_thread, to_thread);
+		mpz_sub(to_thread, to, from); // to_thread = to - from;
+		mpz_set(from_thread, to_thread); // from_thread = to_thread;
 
-		mpz_div_ui(to_thread, to_thread, threads); // CONTROLLA E FINISCI DA QUI
-		mpz_mul_ui(to_thread, to_thread, my_thread + 1);
+		mpz_div_ui(to_thread, to_thread, threads); // to_thread = to_thread / threads;
+		mpz_mul_ui(to_thread, to_thread, my_thread + 1); // to_thread = to_thread * (my_thread + 1);
 
-		mpz_div_ui(from_thread, from_thread, threads);
-		mpz_mul_ui(from_thread, from_thread, my_thread);
+		mpz_div_ui(from_thread, from_thread, threads); // from_thread = from_thread / threads;
+		mpz_mul_ui(from_thread, from_thread, my_thread); // from_thread = from_thread * my_thread;
 
-		mpz_add(from_thread, from_thread, from);
-		mpz_add(to_thread, to_thread, from);
+		mpz_add(from_thread, from_thread, from); // from_thread = from_thread + from;
+		mpz_add(to_thread, to_thread, from); // to_thread = to_thread + from;
 
 		while(mpz_cmp(from_thread, to_thread) <= 0) {
-			// DOPO QUI NON HO ANCORA FINITO
-			if(the_number % (from + i) == 0) {
+			
+			if(mpz_divisible_p(the_number, from_thread)) {
+
+				mpz_divexact(divided, the_number, from_thread); // divided = the_number / from_thread; // Only works if the_number % from_thread == 0;
+				
 				#pragma omp critical
 				{
-					add(&head, from + i);
-					add(&head, the_number / (from + i));
+					add(&head, from_thread);
+					add(&head, divided);
 				}
-				//QUISOMMA
+				mpz_add_ui(from_thread, from_thread, 1); // ++from_thread;
 			}
 		}
 	}
+
+	// TODO IMPORTANT: make work with gmp
 	do {
 		to_send = pick(&head);
 		shit_happened = MPI_Ssend(&to_send, 1, MPI_LONG_LONG, 0, 0, MPI_COMM_WORLD);
