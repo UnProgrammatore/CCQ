@@ -3,11 +3,6 @@
 \label{sec:introduzione}
 %************************************************
 
-%************************************************
-\section{Introduzione e obiettivi}
-\label{sec:introduzione}
-%************************************************
-
 -sicurezza
 -perchè rsa
 -perchè problema della fattorizzazione
@@ -44,33 +39,15 @@ Alice quindi cifra il messaggio con la propria chiave privata e successivamente 
 
 Il funzionamento di RSA non è particolarmente complesso.
 Supponiamo che Alice e Bob stiano avendo un dialogo segreto, ossia non vogliono che un eventuale haker possa intercettare la loro comunicazione e comprenderne il significato.
-Sia quindi \textit{M} il messaggio che si vogliono scambiare.
-Ognuno di loro sceglie due numeri primi \textit{p} e \textit{q} li moltiplica tra di loro ottenendo \textit{N=p.q}.
-In seguito calcolano \varphi\left( \textit{N}\right(  = \left( \textit{p-1}\right(\left(\textit{q-1}\right( .
-Scelgono infine un numero \textit{e} coprimo con \varphi\left(\textit{N}\right( e minore dello stesso e calcolano \textit{d} tale per cui \textit{e.d\equiv 1 mod\left(N\right(}.
-Ora \left(\textit{N, e}\right( è la chiave pubblica, mentre quella privata è \left(\textit{N, d}\right(.
-Il messaggio visibile sulla rete è il seguente: \textit{\esp(\textit{M},1)=\exp(M,e)mod\left(N\right(} che verr\'{a} poi decifrato applicando una semplice esponenziazione di esponente \textit{d}, elemento della chiave pubblica del mittente.
+Sia quindi \emph{M} il messaggio che si vogliono scambiare.
+Ognuno di loro sceglie due numeri primi \emph{p} e \emph{q} li moltiplica tra di loro ottenendo \emph{N=p.q}.
+In seguito calcolano $\varphi( N)  = ( p-1)(q-1)$.
+Scelgono infine un numero \emph{e} coprimo con $\varphi(N)$ e minore dello stesso e calcolano \emph{d} tale per cui $e.d\equiv 1 mod(N)$.
+Ora $(N, e)$ è la chiave pubblica, mentre quella privata è $(N, d)$.
+Il messaggio visibile sulla rete è il seguente: $\exp(M,1)=\exp(M,e)mod(N)$ che verr\'{a} poi decifrato applicando una semplice esponenziazione di esponente \emph{d}, elemento della chiave pubblica del mittente.
 
-La sicurezza di quest'algoritmo risiede nella difficoltà computazionale di fattorizzare il numero \textit{N} nei suoi fattori primi e quindi nel trovare la funzione \varphi\left(\textit{N}\right(
-che permetterebbe di trovare l'inverso moltiplicativo di \textit{e} e quindi rompere i sistema.
+La sicurezza di quest'algoritmo risiede nella difficoltà computazionale di fattorizzare il numero \emph{N} nei suoi fattori primi e quindi nel trovare la funzione $\varphi(N)$
+che permetterebbe di trovare l'inverso moltiplicativo di \emph{e} e quindi rompere i sistema.
 
 Nel 1991 la RSA Laboratories propose come sfida la fattorizzazione di 54 semiprimi ( prodotti di due primi ) con un numero di cifre compreso tra 100 e 617.
 Ad oggi solo i 12 pi\'{u} piccoli sono stati fattorizzati e, nonostante il 2007 vide la chiusura dell'RSA Challenge in molti ancora si dilettano nel tentativo di fattorizzarli.
-
-
-
-
-\lipsum[1]
-
-
-
-
-
-
-
-
-\lipsum[1]
-
-
-
-

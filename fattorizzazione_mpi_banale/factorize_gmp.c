@@ -60,8 +60,6 @@ void master_procedure(int comm_size) {
 }
 
 void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
-	long long from, to;
-	long long to_send;
 	int shit_happened;
 	struct elem* head = NULL;
 
@@ -88,9 +86,11 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 		mpz_t from_thread;
 		mpz_t to_thread;
 		mpz_t divided;
+		mpz_t to_send;
 		mpz_init(from_thread);
 		mpz_init(to_thread);
 		mpz_init(divided);
+		mpz_init(to_send);
 
 		mpz_sub(to_thread, to, from); // to_thread = to - from;
 		mpz_set(from_thread, to_thread); // from_thread = to_thread;
@@ -123,6 +123,8 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 	// TODO IMPORTANT: make work with gmp
 	do {
 		to_send = pick(&head);
+		int how_many_bytes = mpz_sizeinbase(to_send, 2) + 
+		
 		shit_happened = MPI_Ssend(&to_send, 1, MPI_LONG_LONG, 0, 0, MPI_COMM_WORLD);
 
 		if(shit_happened) {
