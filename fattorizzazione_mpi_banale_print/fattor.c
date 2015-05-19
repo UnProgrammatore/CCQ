@@ -99,8 +99,8 @@ void print_results(struct result r) {
 	//printf("# Factors:")
 	
 	// header
-	printf("# number time\n");
-	printf("%lld %.6lf\n", r.num, r.w_time);
+	//printf("# number time\n");
+        printf("%.6lf", r.w_time);
 }
 
 int main(int argc, char** argv) {
