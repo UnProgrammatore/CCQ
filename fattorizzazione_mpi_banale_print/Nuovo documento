@@ -1,0 +1,9 @@
+for N
+	for M
+		fattor N
+
+script: N fattor: T1 T2 T3 T4 ... TM script: \n
+
+N1, T1, ... TM,
+N2, T1, ... TM,
+N3, T1, ... TM,
