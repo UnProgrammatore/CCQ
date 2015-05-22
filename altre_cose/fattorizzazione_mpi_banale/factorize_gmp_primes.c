@@ -63,6 +63,7 @@ void master_procedure(int comm_size) {
 			MPI_Abort(MPI_COMM_WORLD, 1);
 		}
 
+		
 		if(mpz_cmp_ui(received_number, 0) == 0) // if(received_number == 0)
 			++i;
 		else {
@@ -81,37 +82,18 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 	mpz_t from;
 	mpz_t to;
 	mpz_t to_send;
-	mpz_t div2;
-	mpz_t number2;
 	mpz_init(temp);
 	mpz_init(from);
 	mpz_init(to);
 	mpz_init(to_send);
-	mpz_init(div2);
-
-	mpz_init(number2);
-	mpz_set_ui(number2, 2);
 
 	mpz_root(temp, the_number, 2); // temp = sqrt(the_number);
 	mpz_div_ui(temp, temp, comm_size - 1); // temp = temp / (comm_size - 1);
 	
 	mpz_mul_ui(from, temp, my_rank - 1); // from = temp * (my_rank - 1);
 	mpz_mul_ui(to, temp, my_rank); // to = temp * my_rank;
-	
-	if(mpz_cmp_ui(from, 0) == 0) { // if(from == 0)
-		
-		if(mpz_divisible_ui_p(the_number, 2)) {
 
-				mpz_divexact_ui(div2, the_number, 2); // divided = the_number / from_thread; // Only works if the_number % from_thread == 0;
-				
-				add(&head, number2);
-				add(&head, div2);
-
-			}
-		mpz_set_ui(from, 1); // from = 1;
-	}
-	if(mpz_divisible_ui_p(from, 2)) // if(from % 2 == 0)
-		mpz_add_ui(from, from, 1); // ++from;
+	mpz_cmp_ui(from, 0) ? : mpz_set_ui(from, 1); // from == 0 ? from = 1 : ;
 
 	#pragma omp parallel shared(from, to)
 	{
@@ -137,9 +119,6 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 		mpz_add(from_thread, from_thread, from); // from_thread = from_thread + from;
 		mpz_add(to_thread, to_thread, from); // to_thread = to_thread + from;
 
-		if(mpz_divisible_ui_p(from_thread, 2)) // if(from_thread % 2 == 0)
-			mpz_add_ui(from_thread, from_thread, 1); // from_thread = from_thread + 1;
-
 		while(mpz_cmp(from_thread, to_thread) <= 0) {
 
 			if(mpz_divisible_p(the_number, from_thread)) {
@@ -152,10 +131,11 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 					add(&head, divided);
 				}
 			}
-			mpz_add_ui(from_thread, from_thread, 2); // from_thread += 2;
+			mpz_nextprime(from_thread, from_thread); // from_thread = primo_successivo(from_thread);
 		}
 	}
 
+	// TODO IMPORTANT make work with gmp
 	do {
 		pick(&head, to_send);
 		int how_many_bytes = (mpz_sizeinbase(to_send, 2) + 7) / 8; // How many bytes is to_send

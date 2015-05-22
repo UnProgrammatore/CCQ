@@ -139,6 +139,7 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 		pick(&head, to_send);
 		int how_many_bytes = (mpz_sizeinbase(to_send, 2) + 7) / 8; // How many bytes is to_send
 		buffer = malloc(how_many_bytes);
+		*buffer = 0;
 
 		mpz_export(buffer, NULL, 1, 1, 1, 0, to_send); // Export the number to buffer
 

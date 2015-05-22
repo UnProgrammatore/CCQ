@@ -146,10 +146,17 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 
 				mpz_divexact(divided, the_number, from_thread); // divided = the_number / from_thread; // Only works if the_number % from_thread == 0;
 				
-				#pragma omp critical
-				{
-					add(&head, from_thread);
-					add(&head, divided);
+				if(mpz_probab_prime_p(from_thread, 25)) {
+					#pragma omp critical
+					{
+						add(&head, from_thread);
+					}
+				}
+				if(mpz_probab_prime_p(divided, 25)) {
+					#pragma omp critical
+					{
+						add(&head, divided);
+					}
 				}
 			}
 			mpz_add_ui(from_thread, from_thread, 2); // from_thread += 2;
