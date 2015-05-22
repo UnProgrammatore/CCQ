@@ -21,7 +21,7 @@ fig = plt.figure() #
 top    = fig.add_subplot(211) # 2 rows, 1 col, plot 1
 bottom = fig.add_subplot(212) # 2 rows, 1 col, plot 2
 
-top.set_title('ERATOSTENE-THREAD')
+top.set_title('ERATOSTENE-FAST')
 top.grid()
 top.set_ylabel('time (s)')
 top.plot(NUM1, TIME1, 'b-')

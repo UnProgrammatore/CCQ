@@ -7,6 +7,6 @@ echo "" > $5
 
 for N in $(seq $1 $2 $3)
 do
-    ./crivello_eratostene $N >> $4
-    ./eratostene -n $N >> $5
+    ./crivello_eratostene $N >> $5
+    ./crivello_eratostene_par $N >> $4
 done
