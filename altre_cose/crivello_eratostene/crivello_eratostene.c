@@ -3,12 +3,12 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <omp.h>
 #include <gmp.h>
 
-typedef long unsigned lu;
 
-void eratosthenes_sieve(short * sieve, lu n) {
+void eratosthenes_sieve(short * sieve, long unsigned n) {
   #pragma opm parallel shared(sieve)
   {
 
