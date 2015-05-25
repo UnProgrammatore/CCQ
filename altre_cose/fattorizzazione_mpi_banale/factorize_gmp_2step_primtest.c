@@ -21,7 +21,7 @@ void add(struct elem** head, mpz_t val) {
 	mpz_init(app->val);
 	mpz_set(app->val, val); // app->val = val;
 	app->next = *head;
-	*head = app;
+	*head = app;	
 }
 
 void pick(struct elem** head, mpz_t toret) {
