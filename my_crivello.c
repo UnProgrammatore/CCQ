@@ -71,3 +71,35 @@ long unsigned base_fattori(mpz_t numero, mpz_t radice, long unsigned base_fattor
 		}
 	}
 }
+
+void quadratic_sieve(mpz_t n) {
+/* */
+
+/* Tentativo di fattorizzazione con primi piccoli */
+brute_force_factorize(n, known_primes, factors_list);	
+
+/* n è già stato eventualmente fattorizzato
+ * in primi minori di p = known_primes[max_prime]
+ * se p*p > n sappiamo che tutti i suoi eventuali 
+ * fattori sono <= p ma avendoli già controllati
+ * deduciamo che n è un primo. */
+if(mpz_cmp_ui(n, p*p) < 0)  // p*p > n
+	if(mpz_cmp_ui(n, 1) > 0)  // n > 1
+		/* n è stato fattorizzato completamnete in fatt <= p e n*/
+	else
+		/* n è stato fattorizzato compl in fatt <= p */
+
+/* test di primalita' di rabin */
+mpz_probab_prime_p(n, 25)
+
+mpz_t s;
+mpz_init(s);
+
+mpz_sqrt(s, n); // s = sqrt(n);
+
+
+
+
+
+
+}
