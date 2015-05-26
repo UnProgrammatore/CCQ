@@ -15,7 +15,7 @@ short uguali_modulo_mpz_ui(long unsigned f1, mpz_t f2, long unsigned modulo) {
 	return (f1 % modulo) == mpz_get_ui(appoggio);
 }
 
-sol_pair calcola_cosi(mpz_t radice, long unsigned j, long unsigned p) {
+sol_pair calcola_soluzioni(mpz_t radice, long unsigned j, long unsigned p) {
 	mpz_t appoggio;
 	mpz_init(appoggio);
 
@@ -25,11 +25,13 @@ sol_pair calcola_cosi(mpz_t radice, long unsigned j, long unsigned p) {
 	mpz_mod_ui(appoggio, appoggio, p);
 
 	pair.sol1 = mpz_get_ui(appoggio);
+	pair.sol1 = (p - pair.sol1) % p;
 
 	mpz_add_ui(appoggio, radice, j);
 	mpz_mod_ui(appoggio, appoggio, p);
 
 	pair.sol2 = mpz_get_ui(appoggio);
+	pair.sol2 = (p - pair.sol2) % p;
 
 	return pair;
 
@@ -58,11 +60,7 @@ long unsigned base_fattori(mpz_t numero, mpz_t radice, long unsigned base_fattor
 			
 			if(uguali_modulo_mpz_ui(j*j, numero, primi[i])) {
 				
-				pair = calcola_cosi(radice, j, primi[i]);
-
-				soluzioni[k].sol1 = (primi[i] - pair.sol1) % primi[i];
-				soluzioni[k].sol2 = (primi[i] - pair.sol2) % primi[i];
-
+				soluzioni[k] = calcola_soluzioni(radice, j, primi[i]);
 				base_fattori[k] = primi[i];
 
 				++k;
