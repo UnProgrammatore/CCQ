@@ -1,14 +1,6 @@
 #include <stdio.h>
 #include <gmp.h>
 
-typedef matrix unsigned long**;
-
-void init_matrix(matrix, unsigned x, unsigned y) {
-	matrix = malloc(x * sizeof(unsigned long*));
-	for(; x >= 0; --x)
-		matrix[x] = malloc(y * sizeof(unsigned long));
-}
-
 typedef struct sol_pair_ {
 	long unsigned sol1;
 	long unsigned sol2;
