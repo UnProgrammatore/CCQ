@@ -4,7 +4,7 @@
 // Aggiungere l'header con le pair
 
 void sieve(
-	mpz_t n, 
+	mpz_t n,
 	unsigned int* factor_base,
 	unsigned int base_dim,
 	pair* solutions,

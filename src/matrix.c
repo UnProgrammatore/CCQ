@@ -27,14 +27,14 @@ void set_matrix(unsigned int** matrix, unsigned int x, unsigned int y, unsigned 
 }
 
 
-void init_matrix_long(unsigned long*** matrix, unsigned int x, unsigned int y) {
+void init_matrix_l(unsigned long*** matrix, unsigned int x, unsigned int y) {
 	*matrix = (unsigned long**) malloc(y * sizeof(unsigned long*));
 	for(; y > 0; --y) {
 		(*matrix)[y - 1] = malloc(x * sizeof(unsigned long));
 	}
 }
 
-void finalize_matrix_long(unsigned long*** matrix, unsigned int y) {
+void finalize_matrix_l(unsigned long*** matrix, unsigned int y) {
 	for(; y > 0; --y) {
 		free((*matrix)[y - 1]);
 	}
@@ -42,10 +42,10 @@ void finalize_matrix_long(unsigned long*** matrix, unsigned int y) {
 	*matrix = 0;
 }
 
-unsigned int get_matrix_long(unsigned long** matrix, unsigned int x, unsigned int y) {
+unsigned int get_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y) {
 	return (matrix[y])[x];
 }
 
-void set_matrix_long(unsigned long** matrix, unsigned int x, unsigned int y, unsigned int value) {
+void set_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y, unsigned int value) {
 	(matrix[y])[x] = value;
 }
