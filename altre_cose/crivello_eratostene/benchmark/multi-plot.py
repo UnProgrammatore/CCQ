@@ -24,13 +24,13 @@ bottom = fig.add_subplot(212) # 2 rows, 1 col, plot 2
 top.set_title('ERATOSTENE-FAST')
 top.grid()
 top.set_ylabel('time (s)')
-top.plot(NUM1, TIME1, 'b-')
+top.plot(NUM1, TIME1, 'bo-')
 
 bottom.set_title('ERATOSTENE')
 bottom.grid()
 bottom.set_xlabel('n')
 bottom.set_ylabel('time (s)')
-bottom.plot(NUM2, TIME2, 'r-')
+bottom.plot(NUM2, TIME2, 'ro-')
 
 plt.subplots_adjust(hspace=0.5)
 
