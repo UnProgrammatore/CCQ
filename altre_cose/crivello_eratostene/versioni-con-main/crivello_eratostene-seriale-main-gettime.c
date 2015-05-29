@@ -23,7 +23,6 @@ void eratosthenes_sieve(int * sieve, long unsigned n) {
 
 		if(sieve[i/2] == 1) {
 			long unsigned j;
-			#pragma omp parallel for schedule(dynamic)
 			for(j = i; j <= n/i; j++)
 				sieve[(i*j)/2] = 0;
 
@@ -36,16 +35,17 @@ int main(int argc, char * argv[]) {
 	int * sieve = (int *) malloc(sizeof(int) * (n/2));
 
 #ifdef TIME
-	clock_t c1, c2;
-	c1 = clock();
+	struct timeval tempo;
+	gettimeofday(&tempo,0);
+	double t1=tempo.tv_sec+(tempo.tv_usec/1000000.0);
 #endif
 
 	eratosthenes_sieve(sieve, n);
 
 #ifdef TIME 
-	c2 = clock();
-	printf("#N time\n");
-	printf("%ld %f\n", n, (float) (c2 - c1)/CLOCKS_PER_SEC);
+	gettimeofday(&tempo,0);
+	double t2=tempo.tv_sec+(tempo.tv_usec/1000000.0);
+	printf("%ld %.6f\n", n, t2-t1);
 #endif
 #ifdef VERBOSE
 	printf("#");
