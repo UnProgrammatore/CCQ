@@ -1,0 +1,14 @@
+#time_gauss time_set_up time_totale
+0.192644 0.396044 0.588688
+#time_gauss time_set_up time_totale
+0.192609 0.400886 0.593495
+#time_gauss time_set_up time_totale
+0.192328 0.402228 0.594556
+#time_gauss time_set_up time_totale
+0.192259 0.401350 0.593609
+#time_gauss time_set_up time_totale
+0.192582 0.403355 0.595937
+#time_gauss time_set_up time_totale
+0.192501 0.397987 0.590488
+#time_gauss time_set_up time_totale
+0.192442 0.399931 0.592373
