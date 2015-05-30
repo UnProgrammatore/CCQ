@@ -42,7 +42,7 @@ void finalize_matrix_l(unsigned long*** matrix, unsigned int y) {
 	*matrix = 0;
 }
 
-unsigned int get_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y) {
+unsigned long get_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y) {
 	return (matrix[y])[x];
 }
 
