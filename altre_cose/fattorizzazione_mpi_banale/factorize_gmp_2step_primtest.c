@@ -186,7 +186,7 @@ void slave_procedure(int my_rank, int comm_size, mpz_t the_number) {
 int main(int argc, char** argv) {
 	int my_rank, comm_size;
 	mpz_t the_number;
-
+	
 	mpz_init(the_number);
 
 	MPI_Init(&argc, &argv);

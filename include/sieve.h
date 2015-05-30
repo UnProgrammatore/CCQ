@@ -13,7 +13,8 @@ void sieve(
 	unsigned int* first_bit_1,
 	unsigned int* count_1,
 	unsigned int* valori_a,
-	unsigned int* dependencies
+	unsigned int* dependencies,
+	unsigned int poly_val_num
 	);
 
 #endif // SIEVE_GUARD
