@@ -67,6 +67,8 @@ int legendre(mpz_t n, unsigned int p ){
 }
 
 
+
+/*3
 int main(){
 
     printf("ciao pippo1 \n");
@@ -107,3 +109,4 @@ int main(){
 
 
 }
+*/
