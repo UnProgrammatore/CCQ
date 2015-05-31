@@ -11,7 +11,8 @@ int main(){
 
     mpz_t J; 
 	mpz_init(J);
-	mpz_set_ui(J, 8616460799);
+	//mpz_set_ui(J, 8616460799);
+	mpz_set_str(J, "8616460799", 10);
 
 	
 

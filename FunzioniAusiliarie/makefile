@@ -1,8 +1,8 @@
 
 
 
-main: main.c factor_base.o
-	gcc main.c factor_base.o -lgmp -o main
+main: main.c factor_base.o legendre.o
+	gcc main.c factor_base.o legendre.o -lgmp -o main
 
 factor_base.o: factor_base.c legendre.o
 	gcc -c factor_base.c legendre.o -std=c99
