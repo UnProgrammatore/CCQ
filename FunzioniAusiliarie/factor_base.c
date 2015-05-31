@@ -1,3 +1,5 @@
+
+
 #include "factor_base.h"
 
 /*
@@ -33,19 +35,21 @@
 
 */
 
-void factor_base_erat(mpz_t N, unsigned int* erat, unsigned int dim_erat, unsigned int* fb, unsigned int& fb_dim){
+void factor_base_erat(mpz_t N, unsigned int* erat, unsigned int dim_erat, unsigned int* fb, unsigned int* fb_dim){
 
 	int res = 0;
 
+	
 	for(int i=0; i<dim_erat; ++i){
-		if(legendre(N,erat[i])==1){
+		int ls = legendre(N,erat[i]);
+		if(ls==1){
 			fb[res]=erat[i];
 			res++;
 		}
 
 	}
     
-    fb_dim = res;
+    *fb_dim = res;
 
 }
 
@@ -73,3 +77,4 @@ void factor_base_erat(mpz_t N, unsigned int* erat, unsigned int dim_erat, unsign
 
     mpfr_pow_ui(pomerance_approx, e, ui_exp, GMP_RNDN );
 */
+
