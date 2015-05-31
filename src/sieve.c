@@ -1,7 +1,7 @@
-#include <sieve.h>
-#include <vector.h>
+#include "../include/sieve.h"
+#include "../include/vector.h"
 
-void sieve(
+unsigned int sieve(
 	mpz_t n,
 	unsigned int* factor_base,
 	unsigned int base_dim,
@@ -15,6 +15,7 @@ void sieve(
 	mpz_init(intermed);
 	mpz_sqrt(n_root, n);
 
+	unsigned int fact_count = 0;
 	unsigned int i, j;
 	mpz_t* evaluated_poly;
 	init_vector_mpz(evaluated_poly, poly_val_num);
@@ -36,8 +37,11 @@ void sieve(
 			while(mpz_divisible_p_ui(evaluated_poly[j], factor_base[i])) {
 				set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
+				
 			}
-		
+			
+			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
+				++fact_count;
 		}
 
 		// Faccio la stessa cosa con entrambe le soluzioni, a meno che non stia usando 2
@@ -48,10 +52,11 @@ void sieve(
 					set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				}
+			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
+				++fact_count;
 			
 			}
 		}
-
 	}
-
+	return fact_count;
 }
