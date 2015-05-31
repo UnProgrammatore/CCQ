@@ -52,8 +52,8 @@ unsigned int sieve(
 					set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				}
-			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
-				++fact_count;
+				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
+					++fact_count;
 			
 			}
 		}
