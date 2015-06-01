@@ -4,8 +4,6 @@
 #include <gmp.h>
 #include "pair.h"
 
-// Aggiungere l'header con le pair
-
 unsigned int sieve(
 	mpz_t n, // Il numero da fattorizzare
 	unsigned int* factor_base, // La base di fattori
