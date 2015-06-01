@@ -2,16 +2,15 @@
 #define SIEVE_GUARD
 
 // Aggiungere l'header con le pair
-#include "vector.h"
-#include "matrix.h"
+
 #include <gmp.h>
 
 struct pair {
-	unsigned int sol1;
-	unsigned int sol2;
+  unsigned int sol1;
+  unsigned int sol2;
 };
 
-void sieve(
+unsigned int sieve(
 	mpz_t n, // Il numero da fattorizzare
 	unsigned int* factor_base, // La base di fattori
 	unsigned int base_dim, // La dimensione della base di fattori

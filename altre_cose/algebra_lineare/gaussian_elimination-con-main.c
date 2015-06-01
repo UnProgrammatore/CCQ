@@ -175,6 +175,15 @@ void print_M(unsigned int ** M, int r, int c) {
   }
 }
 
+void print_M_con_i(unsigned int ** M, int r, int c) {
+  for(int i = 0; i < r; ++i) {
+    printf("%d:  ", i);
+   for(int j = 0; j < c; ++j)
+     printf("%u, ", get_matrix(M, i, j));
+   printf("\n");
+  }
+}
+
 void print_M_2(unsigned int ** M, int r, int c) {
   for(int i = 0; i < r; ++i) {
    for(int j = 0; j < c; ++j)
@@ -189,12 +198,11 @@ int main() {
   unsigned int ** M_z;
 
   unsigned long n_primes = 15;
-  unsigned long n_fatt = 1000;
   unsigned long n_blocchi = 16;//n_primes / N_BIT
 
   double t1, t2;
 
-  unsigned int poly_val_num = 5;
+  unsigned int poly_val_num = 35;
 
   mpz_t N;
   mpz_init(N);
@@ -235,13 +243,24 @@ int main() {
   solutions[c++].sol2 = 55;
   solutions[c].sol1 = 34;
   solutions[c++].sol2 = 57;
+
+  for(int k = 0; k < n_primes; ++k)
+    printf("%d: xp=%d, yp=%d\n", factor_base[k], solutions[k].sol1, solutions[k].sol2);
+  printf("\n");
  
   unsigned int ** exponents;
-  init_matrix(& exponents, 34, n_primes);
+  init_matrix(& exponents, poly_val_num, n_primes);
+  for(int i = 0; i < poly_val_num; ++i)
+    for(int j = 0; j < n_primes; ++j)
+      set_matrix(exponents, i, j, 0);
 
-  sieve(N, factor_base, n_primes, solutions, exponents, 34);
+  print_M(exponents, poly_val_num, n_primes);
 
-  print_M(exponents, 34, n_primes);
+  unsigned int n_fatt = sieve(N, factor_base, n_primes, solutions, exponents, poly_val_num);
+
+  //printf("n_fatt=%d\n", n_fatt);
+
+  print_M_con_i(exponents, poly_val_num, n_primes);
 
   t1 = omp_get_wtime();
   init_matrix(& M_z, n_fatt, n_primes);
