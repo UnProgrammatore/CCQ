@@ -1,5 +1,6 @@
-#include "../include/sieve.h"
-#include "../include/vector.h"
+#include "sieve.h"
+#include "vector.h"
+#include "matrix.h"
 
 unsigned int sieve(
 	mpz_t n,
@@ -19,7 +20,7 @@ unsigned int sieve(
 	unsigned int fact_count = 0;
 	unsigned int i, j;
 	mpz_t* evaluated_poly;
-	init_vector_mpz(evaluated_poly, poly_val_num);
+	init_vector_mpz(&evaluated_poly, poly_val_num);
 
 	// Trovo poly_val_num valori del polinomio (A + s)^2 - n, variando A
 	for(i = 0; i < poly_val_num; ++i) {
@@ -36,7 +37,7 @@ unsigned int sieve(
 		for(j = solutions[i].sol1; j < poly_val_num; j += factor_base[i]) {
 
 			// Divido e salvo l'esponente va bene
-			while(mpz_divisible_p_ui(evaluated_poly[j], factor_base[i])) {
+			while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
 				set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				
@@ -50,7 +51,7 @@ unsigned int sieve(
 		if(factor_base[i] != 2) {
 			for(j = solutions[i].sol2; j < poly_val_num; j += factor_base[i]) {
 
-				while(mpz_divisible_p_ui(evaluated_poly[j], factor_base[i])) {
+				while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
 					set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				}
@@ -82,7 +83,7 @@ unsigned int remove_not_factorized(
 		if(mpz_cmp_ui(reduced_q_a[i], 1) == 0) {
 			mpz_set(q_a[k], q_a[i]);
 			for(j = 0; j < primes_num; ++j)
-				set_matrix(exponents, k, j, get_matrix(exponents, i, j))
+				set_matrix(exponents, k, j, get_matrix(exponents, i, j));
 			++k;
 		}
 	}

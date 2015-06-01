@@ -211,7 +211,7 @@ int main() {
 
   unsigned int factor_base[15] = {2, 5, 7, 11, 17, 23, 37, 47, 59, 67, 71, 83, 89, 97, 101};
 
-  struct pair solutions[15];
+  pair solutions[15];
   unsigned c = 0;
   solutions[c].sol1 = 1;
   solutions[c++].sol2 = 1;
@@ -256,7 +256,10 @@ int main() {
 
   print_M(exponents, poly_val_num, n_primes);
 
-  unsigned int n_fatt = sieve(N, factor_base, n_primes, solutions, exponents, poly_val_num);
+  mpz_t* q_a;
+  init_vector_mpz(q_a, poly_val_num);
+
+  unsigned int n_fatt = sieve(N, factor_base, n_primes, solutions, exponents, q_a, poly_val_num);
 
   //printf("n_fatt=%d\n", n_fatt);
 
