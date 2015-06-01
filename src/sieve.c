@@ -7,6 +7,7 @@ unsigned int sieve(
 	unsigned int base_dim,
 	pair* solutions,
 	unsigned int** exponents,
+	mpz_t* evaluated_poly_original,
 	unsigned int poly_val_num) {
 
 	mpz_t n_root;
@@ -25,6 +26,7 @@ unsigned int sieve(
 		mpz_add_ui(intermed, n_root, i);
 		mpz_mul(intermed, intermed, intermed);
 		mpz_sub(evaluated_poly[i], intermed, n);
+		mpz_set(evaluated_poly_original[i], evaluated_poly[i]);
 	}
 
 	// Per ogni primo nella base di fattori
@@ -58,5 +60,32 @@ unsigned int sieve(
 			}
 		}
 	}
+
+	remove_not_factorized(exponents, evaluated_poly, evaluated_poly_original, poly_val_num, base_dim);
+
 	return fact_count;
+}
+
+unsigned int remove_not_factorized(
+	unsigned int** exponents,
+	mpz_t* reduced_q_a,
+	mpz_t* q_a,
+	unsigned int howmany,
+	unsigned int primes_num
+	) {
+
+	unsigned int i;
+	unsigned int j;
+	unsigned int k;
+
+	for(i = 0; i < howmany; ++i) {
+		if(mpz_cmp_ui(reduced_q_a[i], 1) == 0) {
+			mpz_set(q_a[k], q_a[i]);
+			for(j = 0; j < primes_num; ++j)
+				set_matrix(exponents, k, j, get_matrix(exponents, i, j))
+			++k;
+		}
+	}
+
+	return k;
 }
