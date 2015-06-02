@@ -1,5 +1,6 @@
 #define TYPE unsigned long
 #define N_BITS 64
+#define MAX_TYPE 18446744073709551615UL
 
 //#include "../include/gaussian_elimination.h"
 
@@ -8,6 +9,7 @@
 #include "matrix.h"
 #include <omp.h>
 #include "sieve.h"
+#include "vector.h"
 #include <gmp.h>
 
 /* Funzioni per realizzare l'eliminazione gaussiana in modulo 2
@@ -29,6 +31,64 @@ struct row_stats {
   // num di bit a 1
   long unsigned n_bit;
 };
+
+
+/****************/
+
+/*******************************************************/
+
+void print_bits(word a) {
+  unsigned int bits[N_BITS];
+
+  for(unsigned int i = 0; i < N_BITS; ++i)
+    bits[i] = (a >> i) & 1U;
+
+  for(int i = 63; i >= 0; --i)
+    printf("%d", bits[i]);
+}
+
+void print_all(unsigned long **M, int righe, int blocchi){
+  for(int i = 0; i < righe; ++i) {
+    for(int j = 0; j < blocchi; ++j) {
+      print_bits(get_matrix_l(M, i, j));
+      printf(" ");
+    }
+    printf("\n");
+  }
+}
+
+void print_M(unsigned int ** M, int r, int c) {
+  for(int i = 0; i < r; ++i) {
+   for(int j = 0; j < c; ++j)
+     printf("%u, ", get_matrix(M, i, j));
+   printf("\n");
+  }
+}
+
+void print_M_con_i(unsigned int ** M, int r, int c) {
+  for(int i = 0; i < r; ++i) {
+    printf("%d:  ", i);
+   for(int j = 0; j < c; ++j)
+     printf("%u, ", get_matrix(M, i, j));
+   printf("\n");
+  }
+}
+
+void print_M_2(unsigned int ** M, int r, int c) {
+  for(int i = 0; i < r; ++i) {
+   for(int j = 0; j < c; ++j)
+     printf("%u", get_matrix(M, i, j) % 2);
+   printf("\n");
+  }
+}
+
+/****************/
+/* Funzione che realizza:
+ *   a = b * c mod n */
+void modular_multiplication(mpz_t a, mpz_t b, mpz_t c, mpz_t n) {
+  mpz_mul (a, b, c);
+  mpz_mod (a, a, n);
+}
 
 /* Funzione che ritorna l'i-mo bit della k-ma
  * riga della matrice M */
@@ -125,10 +185,13 @@ void get_wt_k(word ** M, unsigned long k, unsigned long n_col,
 /* Funzione che esegue l'eliminazione gaussiana */
 void gaussian_elimination_mod_2(unsigned int ** M_z,
 				word ** M_z2,
+				mpz_t * Q_A,
+				mpz_t N,
 				unsigned long n_row,
 				unsigned long n_col,
 				unsigned long n_blocks,
 				struct row_stats wt[]) {
+
  for(unsigned long i = 0; i < n_col; ++i) {
     unsigned long j;
     for(j = 0; j < n_row && wt[j].b_dx != i; ++j)
@@ -138,71 +201,126 @@ void gaussian_elimination_mod_2(unsigned int ** M_z,
       if(get_k_i(M_z2, k, i)) { // il bit v(k)(i) deve essere a 1
 	add_vector_z2(M_z2, k, j, n_blocks); // v(k) = v(k) + v(j) mod 2
 	add_vector_z(M_z, k, j, n_col); // v(k) = v(k) + v(j)
-	// moltiplicare i Q(A)
+	//gmp_printf("%Zd * %Zd = ", Q_A[k], Q_A[j]);
+	modular_multiplication(Q_A[k], Q_A[k], Q_A[j], N); // Q(Ak) = Q(Ak) * Q(Aj)
+	//gmp_printf("%Zd\n", Q_A[k]);
 	get_wt_k(M_z2, k, n_col, & wt[k]); // aggiorno wt
       }
     }
+    //printf("\n");
+    //print_all(M_z2, n_row, n_blocks);
+    //printf("\n-----------\n");
   }
 }
 
-/*******************************************************/
+/* Funzione che ritorna se una riga, nella matrice a blocchi mod 2,
+ * è nulla */
+int row_is_null(word ** M_z2, unsigned long k, unsigned long n_col, 
+		 unsigned long n_blocks) {
 
-void print_bits(word a) {
-  unsigned int bits[N_BITS];
+  for(unsigned long i = 0; i < n_blocks-1; ++i) {
+    if(get_matrix_l(M_z2, k, i) != 0)
+      return 0;
+  }
 
-  for(unsigned int i = 0; i < N_BITS; ++i)
-    bits[i] = (a >> i) & 1U;
+  unsigned long n_shift = N_BITS - (n_col % N_BITS);
 
-  for(int i = 63; i >= 0; --i)
-    printf("%d", bits[i]);
+  /* 01010 ... 110XXX ... X      <- X è il padding 
+   *
+   * 1111111111111111111111      <- è MAX_TYPE (tutti 1)
+   * MAX_TYPE << n_shift =
+   * 1111111111111000000000      <- mettendo in & ignoro il padding*/
+
+  print_bits(MAX_TYPE << n_shift);
+  printf("\n");
+  
+  word b = get_matrix_l(M_z2, k, n_blocks-1) & MAX_TYPE << n_shift;
+  if(b != 0)
+    return 0;
+  return 1;  
 }
 
-void print_all(unsigned long **M, int righe, int blocchi){
-  for(int i = 0; i < righe; ++i) {
-    for(int j = 0; j < blocchi; ++j) {
-      print_bits(get_matrix_l(M, i, j));
-      printf(" ");
+void congruence_relation(mpz_t N, // numero da fattorizzare
+			 unsigned int * factor_base,
+			 word ** M_z2, // esponenti mod 2
+			 unsigned int ** M_z, // esponenti interi
+			 mpz_t * Q_a, // vettore Q(Ai)
+			 struct row_stats * wt, // zeri sulle righe
+			 unsigned long n_row,
+			 unsigned long n_primes) {
+
+  mpz_t mpz_temp;
+  mpz_init(mpz_temp);
+
+  mpz_t mpz_prime;
+  mpz_init(mpz_prime);
+
+  mpz_t X;
+  mpz_init(X);
+
+  mpz_t Y;
+  mpz_init(Y);
+
+  mpz_t m;
+  mpz_init(m);
+
+  mpz_t q;
+  mpz_init(q);
+
+  unsigned int exp;
+
+
+  for(unsigned long i = 0; i < n_row; ++i)
+    if(wt[i].n_bit == 0) { // dipendenza trovata
+      mpz_set_ui(Y, 1);
+      for(int j = 0; j < n_primes; ++j) {
+	mpz_set_ui(mpz_prime, factor_base[j]);
+	//gmp_printf("prime=%Zd\n", mpz_prime);
+	exp = get_matrix(M_z, i, j) / 2;
+	//printf("ok\n");
+	// temp = (factor_base[j])^(M_z[i][j]) mod N
+	mpz_powm_ui(mpz_temp, mpz_prime, exp, N);
+	//gmp_printf("temp = %Zd = %Zd^%lu\n", mpz_temp, mpz_prime, exp);
+	
+	// Y = Y * temp mod N
+	modular_multiplication(Y, Y, mpz_temp, N);
+	//gmp_printf("Y = %Zd\n", mpz_temp);
+      }
+
+      mpz_set(X, Q_a[i]);
+      //gmp_printf("(A+s) = %Zd\n", Q_a[i]);
+      gmp_printf("mcd(%Zd + %Zd, %Zd) = ", X, Y, N);
+      mpz_add(X, X, Y); // X = X + Y
+   
+      mpz_gcd(m, X, N); // m = mcd(X + Y, N)    
+      gmp_printf("%Zd", m);
+
+      mpz_divexact(q, N, m); // q = N / m;
+
+      //gmp_printf("%Zd * %Zd = %Zd, N = ", m, q, N);
+
+      if(mpz_cmp(m, N) < 0 &&  mpz_cmp_ui(m, 1) > 0) { // fatt. non banale
+	gmp_printf(", N = %Zd * %Zd\n", m, q);
+      }
+      else
+	printf("\n");
     }
-    printf("\n");
-  }
+
+  //mpz_clears(mpz_temp, mpz_prime, X, Y, m, q);
 }
 
-void print_M(unsigned int ** M, int r, int c) {
-  for(int i = 0; i < r; ++i) {
-   for(int j = 0; j < c; ++j)
-     printf("%u, ", get_matrix(M, i, j));
-   printf("\n");
-  }
-}
-
-void print_M_con_i(unsigned int ** M, int r, int c) {
-  for(int i = 0; i < r; ++i) {
-    printf("%d:  ", i);
-   for(int j = 0; j < c; ++j)
-     printf("%u, ", get_matrix(M, i, j));
-   printf("\n");
-  }
-}
-
-void print_M_2(unsigned int ** M, int r, int c) {
-  for(int i = 0; i < r; ++i) {
-   for(int j = 0; j < c; ++j)
-     printf("%u", get_matrix(M, i, j) % 2);
-   printf("\n");
-  }
-}
-
+/*****************************************************/
 
 int main() {
   word ** M;
   unsigned int ** M_z;
 
   unsigned long n_primes = 15;
-  unsigned long n_blocchi = 16;//n_primes / N_BIT
+  unsigned long n_blocchi = 1;//n_primes / N_BIT
 
   double t1, t2;
 
-  unsigned int poly_val_num = 35;
+  unsigned int poly_val_num = 12800;
 
   mpz_t N;
   mpz_init(N);
@@ -243,10 +361,13 @@ int main() {
   solutions[c++].sol2 = 55;
   solutions[c].sol1 = 34;
   solutions[c++].sol2 = 57;
-
+  /*
   for(int k = 0; k < n_primes; ++k)
     printf("%d: xp=%d, yp=%d\n", factor_base[k], solutions[k].sol1, solutions[k].sol2);
   printf("\n");
+  */
+
+  t1 = omp_get_wtime();
  
   unsigned int ** exponents;
   init_matrix(& exponents, poly_val_num, n_primes);
@@ -254,32 +375,49 @@ int main() {
     for(int j = 0; j < n_primes; ++j)
       set_matrix(exponents, i, j, 0);
 
-  print_M(exponents, poly_val_num, n_primes);
-
-  unsigned int n_fatt = sieve(N, factor_base, n_primes, solutions, exponents, poly_val_num);
-
-  //printf("n_fatt=%d\n", n_fatt);
-
-  print_M_con_i(exponents, poly_val_num, n_primes);
-
-  t1 = omp_get_wtime();
-  init_matrix(& M_z, n_fatt, n_primes);
-  init_matrix_l(& M, n_fatt, n_blocchi);
+  //print_M(exponents, poly_val_num, n_primes);
   
+  mpz_t * Q_A;
+  init_vector_mpz(& Q_A, poly_val_num);
+
+  unsigned int n_fatt;
+  n_fatt = sieve(N, factor_base, n_primes, solutions, exponents, Q_A, poly_val_num);
+  //printf("\n");
+  //printf("n_fatt:%d\n\n", n_fatt);
+
+  //print_M_con_i(exponents, poly_val_num, n_primes);
+
+  //init_matrix(& M_z, n_fatt, n_primes);
+  init_matrix_l(& M, n_fatt, n_blocchi);
+
+  //unsigned int f_c[] = {34, 453, 1134, 3143, 3388, 4514, 4808, 5251, 6033, 6263, 6683, 7508, 8494, 9086, 10233, 12379, 12799};
+
+  //for(int i = 0; i < n_fatt; ++i)
+  //  for(int j = 0; j < n_primes; ++j)
+  //    set_matrix(M_z, i, j, get_matrix(exponents, f_c[i], j));
+
+  //print_M(exponents, n_fatt, n_primes);
+  
+  /*
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j)
       set_matrix(M_z, i, j, rand() % 10);
- 
+  */
+
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j) {
       set_k_i(M, i, j, 0);
     }
-
+ 
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j) {
-      unsigned int a = get_matrix(M_z, i, j); 
+      unsigned int a = get_matrix(exponents, i, j); 
       set_k_i(M, i, j, a);
     }
+
+  //printf("\n");
+
+  //print_all(M, n_fatt, n_blocchi);
 
   struct row_stats * wt = malloc(sizeof(struct row_stats) * n_fatt);
  
@@ -294,9 +432,49 @@ int main() {
   double t_set_up = t2 - t1;
   
   t1 = omp_get_wtime();
-  gaussian_elimination_mod_2(M_z, M, n_fatt, n_primes, n_blocchi, wt);
+  gaussian_elimination_mod_2(exponents, M, Q_A, N, n_fatt, n_primes, n_blocchi, wt);
   t2 = omp_get_wtime();
   double t_gauss = t2 - t1;
+
+  //printf("\n\ngauss:\n");
+
+  //print_M(exponents, n_fatt, n_primes);
+
+  //printf("\n");
+
+  //print_all(M, n_fatt, n_blocchi);
+
+  //printf("\n");
+
+  mpz_t temp;
+  mpz_init(temp);
+  /*
+  for(int i = 0; i < n_fatt; ++i) {
+    //mpz_sqrt(temp, Q_A[i]);
+    //gmp_printf ("%Zd\n", temp);
+    gmp_printf ("%Zd\n", Q_A[i]);
+  }
+  */
+  //printf("\n");
+
+  congruence_relation(N, factor_base, M, exponents, Q_A, wt, n_fatt, n_primes);
+
+  /*
+  if(row_is_null(M, 16, n_primes, n_blocchi))
+    printf("test1 ok\n");
+  else
+    printf("test1 errore\n");
+
+  set_matrix_l(M, 16, 0, 1);
+
+  print_bits(get_matrix_l(M, 16, 0));
+  printf("\n");
+
+  if(row_is_null(M, 16, n_primes, n_blocchi))
+    printf("test2 ok\n");
+  else
+    printf("test2 errore\n");
+  */
 
   printf("#time_gauss time_set_up time_totale\n");
   printf("%.6f ", t_gauss);
