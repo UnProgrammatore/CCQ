@@ -9,6 +9,6 @@ void set_matrix(unsigned int** matrix, unsigned int x, unsigned int y, unsigned 
 void init_matrix_l(unsigned long*** matrix, unsigned int x, unsigned int y);
 void finalize_matrix_l(unsigned long*** matrix, unsigned int x);
 unsigned long get_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y);
-void set_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y, unsigned int value);
+void set_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y, unsigned long value);
 
 #endif // MATRIX_QUARD
