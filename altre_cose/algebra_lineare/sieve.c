@@ -1,7 +1,5 @@
 #include "sieve.h"
 #include "vector.h"
-#include "matrix.h"
-#include <stdio.h>
 
 unsigned int sieve(
 	mpz_t n,
@@ -9,7 +7,7 @@ unsigned int sieve(
 	unsigned int base_dim,
 	pair* solutions,
 	unsigned int** exponents,
-	mpz_t* evaluated_poly_original,
+	mpz_t* As,
 	unsigned int poly_val_num) {
 
 	mpz_t n_root;
@@ -21,6 +19,7 @@ unsigned int sieve(
 	unsigned int fact_count = 0;
 	unsigned int i, j;
 	mpz_t* evaluated_poly;
+
 	init_vector_mpz(& evaluated_poly, poly_val_num);
 
 	// Trovo poly_val_num valori del polinomio (A + s)^2 - n, variando A
@@ -28,7 +27,8 @@ unsigned int sieve(
 		mpz_add_ui(intermed, n_root, i);
 		mpz_mul(intermed, intermed, intermed);
 		mpz_sub(evaluated_poly[i], intermed, n);
-		mpz_add_ui(evaluated_poly_original[i], n_root, i);
+
+		mpz_add_ui(As[i], n_root, i);
 	}
 
 	// Per ogni primo nella base di fattori
@@ -40,17 +40,11 @@ unsigned int sieve(
 			// Divido e salvo l'esponente va bene
 			while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
 				set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
-				//gmp_printf ("%Zd/%d = ", evaluated_poly[j], factor_base[i]);
-				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
-				//gmp_printf ("%Zd\n", evaluated_poly[j]);
- 
-				
+				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);	
 			}
 			
-			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
+			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
 				++fact_count;
-				//gmp_printf ("%Zd\n", evaluated_poly_original[j]);
-			}
 		}
 
 		// Faccio la stessa cosa con entrambe le soluzioni, a meno che non stia usando 2
@@ -59,22 +53,15 @@ unsigned int sieve(
 
 				while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
 					set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
-					//gmp_printf ("%Zd/%d = ", evaluated_poly[j], factor_base[i]);
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
-					//gmp_printf ("%Zd\n", evaluated_poly[j]);
 				}
-				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
-					++fact_count;
-					//gmp_printf ("%Zd\n", evaluated_poly_original[j]);
-				}
-			
+				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
+					++fact_count;			
 			}
 		}
 	}
 
-	//printf("\n");
-
-	remove_not_factorized(exponents, evaluated_poly, evaluated_poly_original, poly_val_num, base_dim);
+	remove_not_factorized(exponents, evaluated_poly, As, poly_val_num, base_dim);
 
 	return fact_count;
 }
@@ -93,10 +80,9 @@ unsigned int remove_not_factorized(
 
 	for(i = 0; i < howmany; ++i) {
 		if(mpz_cmp_ui(reduced_q_a[i], 1) == 0) {
-		  //gmp_printf ("%Zd\n", q_a[i]);
 		  mpz_set(q_a[k], q_a[i]);
 		  for(j = 0; j < primes_num; ++j)
-		    set_matrix(exponents, k, j, get_matrix(exponents, i, j));
+		  	set_matrix(exponents, k, j, get_matrix(exponents, i, j));
 		  ++k;
 		}
 	}

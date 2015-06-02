@@ -1,4 +1,5 @@
-
+#ifndef LEGENDRE_GUARD
+#define LEGENDRE_GUARD
 
 #include <gmp.h>
 #include <stdlib.h>
@@ -33,3 +34,5 @@ int legendre(mpz_t n, unsigned int p );
 
 */
 int legendre_sol(mpz_t n, unsigned int p, pair sol );
+
+#endif // LEGENDRE_GUARD

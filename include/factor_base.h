@@ -1,4 +1,7 @@
-#include "../include/eratostene.h"
+#ifndef FACTOR_BASE_GUARD
+#define FACTOR_BASE_GUARD
+
+#include "eratostene.h"
 #include "legendre.h"
 #include <gmp.h>
 #include <math.h>
@@ -20,3 +23,5 @@ void factor_base_erat(mpz_t N, unsigned int* erat, unsigned int dim_erat, unsign
 	  dal calcolo del crivello di eratostene
 */
 void factor_base(mpz_t N, unsigned int* fb, unsigned int *fb_dim, unsigned int num_call);
+
+#endif // FACTOR_BASE_GUARD

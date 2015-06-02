@@ -9,7 +9,7 @@
  * 		$ gcc -c -lgmp -fopenmp -o eratostene.o eratostene.c
  */
 
-#include "../include/eratostene.h"
+#include "eratostene.h"
 
 void eratosthenes_sieve(unsigned int * sieve, long unsigned n) {
 	int n_threads = omp_get_num_threads();

@@ -1,4 +1,4 @@
-#include "../include/gaussian_elimination.h"
+#include "gaussian_elimination.h"
 #include <stdlib.h>
 
 /* Funzioni per realizzare l'eliminazione gaussiana in modulo 2

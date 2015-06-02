@@ -1,14 +1,15 @@
 #ifndef SIEVE_GUARD
 #define SIEVE_GUARD
 
-// Aggiungere l'header con le pair
-
 #include <gmp.h>
 
-struct pair {
-  unsigned int sol1;
-  unsigned int sol2;
-};
+// Aggiungere l'header con le pair
+
+typedef
+struct pair_ {
+	unsigned int sol1;
+	unsigned int sol2;
+} pair;
 
 typedef struct pair pair;
 

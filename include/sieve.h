@@ -1,7 +1,8 @@
 #ifndef SIEVE_GUARD
 #define SIEVE_GUARD
 
-// Aggiungere l'header con le pair
+#include <gmp.h>
+#include "pair.h"
 
 unsigned int sieve(
 	mpz_t n, // Il numero da fattorizzare
@@ -15,9 +16,10 @@ unsigned int sieve(
 
 unsigned int remove_not_factorized(
 	unsigned int** exponents,
-	unsigned int* reduced_q_a,
-	unsigned int* q_a,
-	unsigned int howmany
+	mpz_t* reduced_q_a,
+	mpz_t* q_a,
+	unsigned int howmany,
+	unsigned int primes_num
 	);
 
 #endif // SIEVE_GUARD
