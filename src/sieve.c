@@ -1,6 +1,4 @@
-#include "sieve.h"
-#include "vector.h"
-#include "matrix.h"
+#include "../include/sieve.h"
 
 unsigned int sieve(
 	mpz_t n,
@@ -8,7 +6,7 @@ unsigned int sieve(
 	unsigned int base_dim,
 	pair* solutions,
 	unsigned int** exponents,
-	mpz_t* evaluated_poly_original,
+	mpz_t* As,
 	unsigned int poly_val_num) {
 
 	mpz_t n_root;
@@ -20,14 +18,16 @@ unsigned int sieve(
 	unsigned int fact_count = 0;
 	unsigned int i, j;
 	mpz_t* evaluated_poly;
-	init_vector_mpz(&evaluated_poly, poly_val_num);
+
+	init_vector_mpz(& evaluated_poly, poly_val_num);
 
 	// Trovo poly_val_num valori del polinomio (A + s)^2 - n, variando A
 	for(i = 0; i < poly_val_num; ++i) {
 		mpz_add_ui(intermed, n_root, i);
 		mpz_mul(intermed, intermed, intermed);
 		mpz_sub(evaluated_poly[i], intermed, n);
-		mpz_set(evaluated_poly_original[i], evaluated_poly[i]);
+
+		mpz_add_ui(As[i], n_root, i);
 	}
 
 	// Per ogni primo nella base di fattori
@@ -39,8 +39,7 @@ unsigned int sieve(
 			// Divido e salvo l'esponente va bene
 			while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
 				set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
-				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
-				
+				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);	
 			}
 			
 			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
@@ -56,13 +55,12 @@ unsigned int sieve(
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				}
 				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
-					++fact_count;
-			
+					++fact_count;			
 			}
 		}
 	}
 
-	remove_not_factorized(exponents, evaluated_poly, evaluated_poly_original, poly_val_num, base_dim);
+	remove_not_factorized(exponents, evaluated_poly, As, poly_val_num, base_dim);
 
 	return fact_count;
 }
@@ -77,14 +75,14 @@ unsigned int remove_not_factorized(
 
 	unsigned int i;
 	unsigned int j;
-	unsigned int k;
+	unsigned int k = 0;
 
 	for(i = 0; i < howmany; ++i) {
 		if(mpz_cmp_ui(reduced_q_a[i], 1) == 0) {
-			mpz_set(q_a[k], q_a[i]);
-			for(j = 0; j < primes_num; ++j)
-				set_matrix(exponents, k, j, get_matrix(exponents, i, j));
-			++k;
+		  mpz_set(q_a[k], q_a[i]);
+		  for(j = 0; j < primes_num; ++j)
+		  	set_matrix(exponents, k, j, get_matrix(exponents, i, j));
+		  ++k;
 		}
 	}
 

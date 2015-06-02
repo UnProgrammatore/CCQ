@@ -1,6 +1,6 @@
-#include "matrix.h"
-#include <stdlib.h>
+#include "../include/matrix.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 
 void init_matrix(unsigned int*** matrix, unsigned int x, unsigned int y) {
@@ -46,6 +46,6 @@ unsigned long get_matrix_l(unsigned long** matrix, unsigned int x, unsigned int 
 	return (matrix[y])[x];
 }
 
-void set_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y, unsigned int value) {
+void set_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y, unsigned long value) {
 	(matrix[y])[x] = value;
 }
