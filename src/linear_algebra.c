@@ -115,8 +115,14 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 
   unsigned int exp;
 
+  unsigned int n_dip = 0;
+  unsigned int n_fatt_non_banali = 0;
+
   for(unsigned long i = 0; i < n_row; ++i)
     if(wt[i].n_bit == 0) { // dipendenza trovata
+
+      ++n_dip;
+
       mpz_set_ui(Y, 1);
       for(int j = 0; j < n_primes; ++j) {
 	mpz_set_ui(mpz_prime, factor_base[j]);
@@ -134,11 +140,14 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 
       mpz_divexact(q, N, m); // q = N / m;
 
+      gmp_printf("%Zd * %Zd\n", m, q);
+
       if(mpz_cmp(m, N) < 0 &&  mpz_cmp_ui(m, 1) > 0) { // fatt. non banale
+	++n_fatt_non_banali;
 	return 1;
       }
     }
   return 0;
 
-  mpz_clears(mpz_temp, mpz_prime, X, Y, NULL); // NON VA
+  mpz_clears(mpz_temp, mpz_prime, X, Y, NULL);
 }

@@ -2,6 +2,7 @@
 #include "../include/vector.h"
 #include "../include/sieve.h"
 #include "../include/matrix.h"
+#include "../include/base_fattori.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,182 +54,119 @@ void print_M_2(unsigned int ** M, int r, int c) {
   }
 }
 
+
 int main() {
-  word ** M;
-  unsigned int ** M_z;
-
-  unsigned long n_primes = 15;
-  unsigned long n_blocchi = 1;//n_primes / N_BIT
-
-  double t1, t2;
-
-  unsigned int poly_val_num = 12800;
+  double t1, t2;  
 
   mpz_t N;
   mpz_init(N);
- 
-  mpz_set_str(N, "8616460799", 10);
+  // mpz_set_str(N, "8616460799", 10); 
+  // mpz_set_str(N, "276833100228154273", 10); 19 0.79
 
-  unsigned int factor_base[15] = {2, 5, 7, 11, 17, 23, 37, 47, 59, 67, 71, 83, 89, 97, 101};
+  mpz_t P1;
+  mpz_init(P1);
 
-  pair solutions[15];
-  unsigned c = 0;
-  solutions[c].sol1 = 1;
-  solutions[c++].sol2 = 1;
-  solutions[c].sol1 = 3;
-  solutions[c++].sol2 = 4;
-  solutions[c].sol1 = 6;
-  solutions[c++].sol2 = 0;
-  solutions[c].sol1 = 6;
-  solutions[c++].sol2 = 4;
-  solutions[c].sol1 = 15;
-  solutions[c++].sol2 = 11;
-  solutions[c].sol1 = 7;
-  solutions[c++].sol2 = 1;
-  solutions[c].sol1 = 21;
-  solutions[c++].sol2 = 34;
-  solutions[c].sol1 = 15;
-  solutions[c++].sol2 = 34;
-  solutions[c].sol1 = 9;
-  solutions[c++].sol2 = 16;
-  solutions[c].sol1 = 51;
-  solutions[c++].sol2 = 25;
-  solutions[c].sol1 = 69;
-  solutions[c++].sol2 = 19;
-  solutions[c].sol1 = 68;
-  solutions[c++].sol2 = 38;
-  solutions[c].sol1 = 8;
-  solutions[c++].sol2 = 87;
-  solutions[c].sol1 = 52;
-  solutions[c++].sol2 = 55;
-  solutions[c].sol1 = 34;
-  solutions[c++].sol2 = 57;
-  /*
-  for(int k = 0; k < n_primes; ++k)
-    printf("%d: xp=%d, yp=%d\n", factor_base[k], solutions[k].sol1, solutions[k].sol2);
-  printf("\n");
-  */
+  mpz_t P2;
+  mpz_init(P2);
+
+  mpz_set_str(P1, "276833100228154279", 10); 
+  mpz_set_str(P2, "27683310022815427963", 10); 
+  mpz_mul(N, P1, P2);
+
+  //gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
+
+  mpz_set_str(N, "439389214701485110197221", 10); 
+
+  mpz_t s;
+  mpz_init(s);
+  mpz_sqrt(s, N);
+
+  unsigned int n = 100000;
+  unsigned int * numbers = malloc(sizeof(unsigned int) * n);
+  unsigned n_all_primes = eratosthenes_sieve(numbers, n);
+
+  unsigned int * primi = malloc(sizeof(unsigned int) * n_all_primes);
+  unsigned int * factor_base = malloc(sizeof(unsigned int) * n_all_primes);
+
+  unsigned j = 0;
+  for(int i = 2; i < n; ++i)
+    if(numbers[i] == 1)
+      primi[j++] = i;
+
+  pair * solutions = malloc(sizeof(pair) * n_all_primes);
 
   t1 = omp_get_wtime();
- 
+  unsigned n_primes = base_fattori(N, s, factor_base, solutions,
+				   primi, n_all_primes);
+  t2 = omp_get_wtime();
+  double t_base = t2 - t1;
+
+  printf("dimensione base di fattori: %d\n", n_primes);
+
+  /*
+  for(int i = 0; i < n_primes; ++i)
+    printf("%d\n", factor_base[i]);
+  */
+
+  unsigned int poly_val_num = 300000;//12800;
+
   unsigned int ** exponents;
   init_matrix(& exponents, poly_val_num, n_primes);
   for(int i = 0; i < poly_val_num; ++i)
     for(int j = 0; j < n_primes; ++j)
       set_matrix(exponents, i, j, 0);
-
-  //print_M(exponents, poly_val_num, n_primes);
   
-  mpz_t * Q_A;
-  init_vector_mpz(& Q_A, poly_val_num);
+  mpz_t * As;
+  init_vector_mpz(& As, poly_val_num);
 
   unsigned int n_fatt;
-  n_fatt = sieve(N, factor_base, n_primes, solutions, exponents, Q_A, poly_val_num);
-  //printf("\n");
-  //printf("n_fatt:%d\n\n", n_fatt);
+  t1 = omp_get_wtime();
+  n_fatt = sieve(N, factor_base, n_primes, solutions, 
+		 exponents, As, poly_val_num);
+  t2 = omp_get_wtime();
+  double t_sieve = t2 - t1;
 
-  //print_M_con_i(exponents, poly_val_num, n_primes);
+  printf("numero fattorizzazioni complete trovate: %d\n", n_fatt);
 
-  //init_matrix(& M_z, n_fatt, n_primes);
+  word ** M;
+  unsigned long n_blocchi = n_primes / N_BITS + 1;
   init_matrix_l(& M, n_fatt, n_blocchi);
-
-  //unsigned int f_c[] = {34, 453, 1134, 3143, 3388, 4514, 4808, 5251, 6033, 6263, 6683, 7508, 8494, 9086, 10233, 12379, 12799};
-
-  //for(int i = 0; i < n_fatt; ++i)
-  //  for(int j = 0; j < n_primes; ++j)
-  //    set_matrix(M_z, i, j, get_matrix(exponents, f_c[i], j));
-
-  //print_M(exponents, n_fatt, n_primes);
-  
-  /*
-  for(int i = 0; i < n_fatt; ++i)
-    for(int j = 0; j < n_primes; ++j)
-      set_matrix(M_z, i, j, rand() % 10);
-  */
-
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j) {
       set_k_i(M, i, j, 0);
     }
- 
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j) {
       unsigned int a = get_matrix(exponents, i, j); 
       set_k_i(M, i, j, a);
     }
 
-  //printf("\n");
-
-  //print_all(M, n_fatt, n_blocchi);
-
   struct row_stats * wt = malloc(sizeof(struct row_stats) * n_fatt);
- 
-  int n_threads = omp_get_num_threads();
-  int chunck = n_fatt/n_threads;
-
-  //#pragma omp parallel for schedule(dynamic, chunck)
   for(int i = 0; i < n_fatt; ++i)
     get_wt_k(M, i, n_primes, & wt[i]);
 
-  t2 = omp_get_wtime();
-  double t_set_up = t2 - t1;
-  
   t1 = omp_get_wtime();
-  gaussian_elimination(exponents, M, Q_A, N, n_fatt, n_primes, n_blocchi, wt);
+  gaussian_elimination(exponents, M, As, N, 
+		       n_fatt, n_primes, n_blocchi, wt);
   t2 = omp_get_wtime();
   double t_gauss = t2 - t1;
 
-  //printf("\n\ngauss:\n");
-
-  //print_M(exponents, n_fatt, n_primes);
-
-  //printf("\n");
-
-  //print_all(M, n_fatt, n_blocchi);
-
-  //printf("\n");
-
   mpz_t temp;
   mpz_init(temp);
-  /*
-  for(int i = 0; i < n_fatt; ++i) {
-    //mpz_sqrt(temp, Q_A[i]);
-    //gmp_printf ("%Zd\n", temp);
-    gmp_printf ("%Zd\n", Q_A[i]);
-  }
-  printf("\n");
-  */
-
   mpz_t N1;
   mpz_t N2;
-
   mpz_init(N1);
   mpz_init(N2);
-
-  if(factorization(N, factor_base, M, exponents, Q_A, wt, n_fatt, n_primes, N1, N2))
-    gmp_printf ("Fattorizzazione trovata: %Zd * %Zd = %Zd\n\n", N1, N2, N);
+  if(factorization(N, factor_base, M, exponents, 
+		   As, wt, n_fatt, n_primes, N1, N2))
+    gmp_printf("Fattorizzazione trovata: %Zd * %Zd = %Zd\n\n", 
+		N1, N2, N);
   else
     printf("Nessuna fattorizzazione non banale trovata\n\n");
-
-  /*
-  if(row_is_null(M, 16, n_primes, n_blocchi))
-    printf("test1 ok\n");
-  else
-    printf("test1 errore\n");
-
-  set_matrix_l(M, 16, 0, 1);
-
-  print_bits(get_matrix_l(M, 16, 0));
-  printf("\n");
-
-  if(row_is_null(M, 16, n_primes, n_blocchi))
-    printf("test2 ok\n");
-  else
-    printf("test2 errore\n");
-  */
-
-  printf("#time_gauss time_set_up time_totale\n");
+  
+  printf("#time_base time_sieve time_gauss time_totale\n");
+  printf("%.6f ", t_base);
+  printf("%.6f ", t_sieve);
   printf("%.6f ", t_gauss);
-  printf("%.6f ", t_set_up);
-  printf("%.6f\n", t_gauss + t_set_up);
+  printf("%.6f\n", t_base + t_gauss + t_sieve);
 }

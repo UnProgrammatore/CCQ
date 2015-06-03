@@ -60,6 +60,11 @@ unsigned int sieve(
 		}
 	}
 
+	);
+
+	mpz_clear(n_root);
+	mpz_clear(intermed);
+
 	remove_not_factorized(exponents, evaluated_poly, As, poly_val_num, base_dim);
 
 	return fact_count;
