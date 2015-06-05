@@ -86,7 +86,7 @@ int main() {
   unsigned n_all_primes = eratosthenes_sieve(numbers, n);
 
   unsigned int * primi = malloc(sizeof(unsigned int) * n_all_primes);
-  unsigned int * factor_base = malloc(sizeof(unsigned int) * n_all_primes);
+  unsigned int * factor_base = primi;//malloc(sizeof(unsigned int) * n_all_primes);
 
   unsigned j = 0;
   for(int i = 2; i < n; ++i)
@@ -114,7 +114,7 @@ int main() {
   init_matrix(& exponents, poly_val_num, n_primes);
   for(int i = 0; i < poly_val_num; ++i)
     for(int j = 0; j < n_primes; ++j)
-      set_matrix(exponents, i, j, 0);
+    set_matrix(exponents, i, j, 0);
   
   mpz_t * As;
   init_vector_mpz(& As, poly_val_num);
@@ -122,7 +122,7 @@ int main() {
   unsigned int n_fatt;
   t1 = omp_get_wtime();
   n_fatt = sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num, 40);
+		 exponents, As, poly_val_num);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 
@@ -131,10 +131,12 @@ int main() {
   word ** M;
   unsigned long n_blocchi = n_primes / N_BITS + 1;
   init_matrix_l(& M, n_fatt, n_blocchi);
+  /*
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j) {
       set_k_i(M, i, j, 0);
     }
+  */
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j) {
       unsigned int a = get_matrix(exponents, i, j); 
@@ -162,6 +164,7 @@ int main() {
 						 As, wt, n_fatt, 
 						 n_primes, N1);
   if(n_fact_non_banali > 0) {
+    mpz_divexact(N2, N, N1);
     gmp_printf("Fattorizzazione trovata: %Zd * %Zd = %Zd\n\n", 
 	       N1, N2, N);
     printf("Numero di fattorizzazioni non banali: %d\n", 
