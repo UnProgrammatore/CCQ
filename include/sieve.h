@@ -14,7 +14,8 @@ unsigned int sieve(
 	pair* solutions, // Il vettore contenente le soluzioni all'equazione
 	unsigned int** exponents, // Il vettore di vettori degli esponenti
 	mpz_t* As, // Vettore in cui verranno salvati i valori di (A + s)
-	unsigned int poly_val_num // Il numero di valori di A che si vogliono provare nel polinomio
+	unsigned int poly_val_num, // Il numero di valori di A che si vogliono provare nel polinomio
+	unsigned int n_fatt_max // Il numero massimo di fattorizzazioni oltre alla base che si vogliono trovare.
 	);
 
 unsigned int remove_not_factorized(

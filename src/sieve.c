@@ -7,7 +7,9 @@ unsigned int sieve(
 	pair* solutions,
 	unsigned int** exponents,
 	mpz_t* As,
-	unsigned int poly_val_num) {
+	unsigned int poly_val_num,
+	unsigned int n_fatt_max
+	) {
 
 	mpz_t n_root;
 	mpz_t intermed;
@@ -30,6 +32,8 @@ unsigned int sieve(
 		mpz_add_ui(As[i], n_root, i);
 	}
 
+	n_fatt_max += base_dim;
+
 	// Per ogni primo nella base di fattori
 	for(i = 0; i < base_dim; ++i) {
 
@@ -42,8 +46,13 @@ unsigned int sieve(
 				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);	
 			}
 			
-			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
+			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
 				++fact_count;
+				if(fact_count >= n_fatt_max) {
+					i = base_dim;
+					j = poly_val_num; // Doppio break
+				}
+			}
 		}
 
 		// Faccio la stessa cosa con entrambe le soluzioni, a meno che non stia usando 2
@@ -54,13 +63,16 @@ unsigned int sieve(
 					set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				}
-				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
-					++fact_count;			
+				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
+				++fact_count;
+					if(fact_count >= n_fatt_max) {
+						i = base_dim;
+						j = poly_val_num; // Doppio break
+					}
+				}		
 			}
 		}
 	}
-
-	);
 
 	mpz_clear(n_root);
 	mpz_clear(intermed);

@@ -11,6 +11,9 @@ OMP = -fopenmp
 USED_LIBS = $(GMP) $(OMP)
 INC = -I$(INC_DIR)
 
+$(EXE_DIR)/main-prova: $(LIB_DIR)/sieve.o $(LIB_DIR)/vector.o $(LIB_DIR)/matrix.o $(SRC_DIR)/main-prova.c
+	$(CC) $^ $(CC_ARGS) $(USED_LIBS) -o $@
+
 $(EXE_DIR)/gaussian_elimination-con-main: $(LIB_DIR)/sieve.o $(LIB_DIR)/vector.o $(LIB_DIR)/matrix.o $(TEST_DIR)/gaussian_elimination-con-main.c
 	$(CC) $^ $(CC_ARGS) $(USED_LIBS) -o $@
 
