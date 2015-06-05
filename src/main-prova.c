@@ -160,7 +160,7 @@ int main() {
   unsigned int n_fact_non_banali = factorization(N, factor_base, 
 						 M, exponents, 
 						 As, wt, n_fatt, 
-						 n_primes, N1, N2);
+						 n_primes, N1);
   if(n_fact_non_banali > 0) {
     gmp_printf("Fattorizzazione trovata: %Zd * %Zd = %Zd\n\n", 
 	       N1, N2, N);

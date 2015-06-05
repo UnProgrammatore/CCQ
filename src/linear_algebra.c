@@ -81,7 +81,7 @@ void gaussian_elimination(unsigned int ** M_z,
       ; // avanzo j e basta
 
    
-    #pragma omp parallel for schedule(dynamic, n_row/4)
+    //#pragma omp parallel for schedule(dynamic, n_row/4)
     for(unsigned k = j + 1; k < n_row; ++k) {
       if(get_k_i(M_z2, k, i)) { // il bit v(k)(i) deve essere a 1
 	add_vector_z2(M_z2, k, j, n_blocks); // v(k) = v(k) + v(j) mod 2
@@ -147,6 +147,7 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
       //gmp_printf("%Zd * %Zd\n", m, q);
 
       if(mpz_cmp(m, N) < 0 &&  mpz_cmp_ui(m, 1) > 0) { // fatt. non banale
+        //gmp_printf("%Zd è un fattore non banale\n", m);
 	++n_fatt_non_banali;
 	//return 1;
       }
