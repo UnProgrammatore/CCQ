@@ -102,8 +102,8 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 		       struct row_stats * wt, // zeri sulle righe
 		       unsigned long n_row, // #fattorizzaz. complete
 		       unsigned long n_primes, // numero base di fattori
-		       mpz_t m, // fattore non banale di N
-		       mpz_t q) { // altro fattore non banale di N
+		       mpz_t m) { // fattore non banale di N
+
 
   mpz_t mpz_temp;
   mpz_init(mpz_temp);
