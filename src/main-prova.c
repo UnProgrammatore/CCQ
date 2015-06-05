@@ -69,19 +69,19 @@ int main() {
   mpz_t P2;
   mpz_init(P2);
 
-  mpz_set_str(P1, "276833100228154279", 10); 
-  mpz_set_str(P2, "27683310022815427963", 10); 
+  mpz_set_str(P1, "1888888888", 10); 
+  mpz_set_str(P2, "5245978939", 10); 
   mpz_mul(N, P1, P2);
 
-  //gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
+  gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
 
-  mpz_set_str(N, "439389214701485110197221", 10); 
+  //mpz_set_str(N, "439389214701485110197221", 10); 
 
   mpz_t s;
   mpz_init(s);
   mpz_sqrt(s, N);
 
-  unsigned int n = 100000;
+  unsigned int n = 50000;
   unsigned int * numbers = malloc(sizeof(unsigned int) * n);
   unsigned n_all_primes = eratosthenes_sieve(numbers, n);
 
@@ -157,10 +157,16 @@ int main() {
   mpz_t N2;
   mpz_init(N1);
   mpz_init(N2);
-  if(factorization(N, factor_base, M, exponents, 
-		   As, wt, n_fatt, n_primes, N1, N2))
+  unsigned int n_fact_non_banali = factorization(N, factor_base, 
+						 M, exponents, 
+						 As, wt, n_fatt, 
+						 n_primes, N1, N2);
+  if(n_fact_non_banali > 0) {
     gmp_printf("Fattorizzazione trovata: %Zd * %Zd = %Zd\n\n", 
-		N1, N2, N);
+	       N1, N2, N);
+    printf("Numero di fattorizzazioni non banali: %d\n", 
+	   n_fact_non_banali);
+  }
   else
     printf("Nessuna fattorizzazione non banale trovata\n\n");
   
