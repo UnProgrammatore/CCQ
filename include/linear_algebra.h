@@ -87,7 +87,6 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 		       struct row_stats * wt, // zeri sulle righe
 		       unsigned long n_row, // #fattorizzaz. complete
 		       unsigned long n_primes, // numero base di fattori
-		       mpz_t N1, // fattore non banale di N
-		       mpz_t N2); // altro fattore non banale di N
+		       mpz_t m); // fattore non banale di N
 
 #endif // LINEAR_ALGEBRA_H
