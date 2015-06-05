@@ -15,6 +15,6 @@
 #include <stdlib.h>
 #include <omp.h>
 
-void eratosthenes_sieve(unsigned int * sieve, long unsigned n);
+unsigned long eratosthenes_sieve(unsigned int * sieve, long unsigned n);
 
 #endif // ERATOSTENE_H
