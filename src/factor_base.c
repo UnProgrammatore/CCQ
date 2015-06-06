@@ -28,22 +28,25 @@
 	quelli che hanno legendre(base.value)!=1 vanno eliminati
 	Siamo sicuri che il primo elemento della base ritornata da eratostene sia
 	2, quindi non dobbiamo eliminarlo.
+
+	solutions* è il vettore che contiene le soluzioni dell'equazione x^2 = n mod p, 
+	anche questo vettore va allocato all'esterno
 */
 
 
-/*
-
-*/
-
-void factor_base_erat(mpz_t N, unsigned int* erat, unsigned int dim_erat, unsigned int* fb, unsigned int* fb_dim){
+void factor_base_erat(mpz_t N, unsigned int* erat, unsigned int dim_erat, unsigned int* fb, unsigned int* fb_dim
+					  pair* solutions){
 
 	int res = 0;
 
 	
 	for(int i=0; i<dim_erat; ++i){
-		int ls = legendre(N,erat[i]);
+		pair *eq;
+		int ls = legendre_sol(N,erat[i],&eq);
 		if(ls==1){
 			fb[res]=erat[i];
+			solutions[res]->sol1 = eq.sol1;
+			solutions[res]->sol2 = eq.sol2;
 			res++;
 		}
 
