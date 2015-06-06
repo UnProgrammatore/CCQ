@@ -38,13 +38,16 @@
 
 
 
-void inizializza_pair(pair p){
-  p.sol1=0;
-  p.sol2=0;
+void inizializza_pair(pair *p){
+  p->sol1=0;
+  p->sol2=0;
 }
 
 
 
+/*
+  Costo O(p/2)
+*/
 int legendre(mpz_t n, unsigned int p ){
 
 
@@ -73,9 +76,13 @@ unsigned int mm = mpz_get_ui(m);
   in solution metto le soluzioni dell'equazione x^2=n mod p
 */
 
-
-int legendre_sol(mpz_t n, unsigned int p, pair sol ){
+/*
+  Costo O(p)
+*/
+int legendre_sol(mpz_t n, unsigned int p, pair *sol ){
  
+  // questa variabile contiene il risultato
+  // 1 se n è residuo quadratico mod p, 0 altrimenti
   int leg = 0;
   /*
     Parte del prof per la ricerca delle soluzioni di 
@@ -94,34 +101,46 @@ int legendre_sol(mpz_t n, unsigned int p, pair sol ){
 
   unsigned int s = (unsigned int)(s1);
 
+ 
+  // dichiaro j fuori per poter riiniziare il secondo ciclo
+  // dall'ultimo valore valutato dal primo
+  unsigned j;
 
-    // Data la simmetria delle soluzioni di "x^2 = n mod p" quando "p"
-    // è dispari, è sufficiente esaminare i valori di "x"
-    // nell'intervallo [0, (p - 1) / 2]
+  /*
+      Uso due cicli for per calcolare le due soluzioni dell'equazione x^2=n mod p
+      Al primo ciclo mi fermo subito dopo aver trovato la prima soluzione.
+      Nel secondo riparto dal valore sul quale mi ero precedentemente fermato.
+      NB if (j!=0) serve solo per non entrare nel secondo ciclo se non si è passati dal primo
+  */
+
     for (unsigned j = 0; 2 * j < p ; ++j){
       if ((j*j) % p == mm) {
-      leg = 1;  
+        leg = 1;
+      }
+    }  
 
-      // Se si entra qui vuol dire che "n" è un residuo quadratico
-      // modulo "p", e quindi "p" fa parte della "base di fattori".
-      // Le due soluzioni di "Q(A) = n mod p" si possono calcolare a
-      // partire dalle soluzioni di "x^2 = n mod p".  Bisogna
-      // accertarsi che la soluzione calcolata cada nell'intervallo
-      // [0, p - 1], e per questo sono necessarie le operazioni di
-      // modulo.
+    for (j = 0;  j < p ; ++j){
+      if ((j*j) % p == mm) {
+        sol->sol1 = j;
+        break;
+      }
+    }  
 
-      
-      sol.sol1 = (p - ((s - j) % p)) % p;
-      sol.sol2 = (p - ((j + s) % p)) % p;
-      
+    if(j!=0){
+      j++;
+      for (j;  j < p ; ++j){
+        if ((j*j) % p == mm) {
+         sol->sol2 = j;
+         break;
+        }
+      }
+    }  
 
-
-      return leg;
-   }
+   return leg;
 }
 
 
-}
+
 
 
 int main(){
@@ -130,11 +149,11 @@ int main(){
 
 	mpz_t n;
 	mpz_init(n);
-	mpz_set_ui(n,23);
+	mpz_set_ui(n,4);
 
     printf("ciao pippo2 \n");
 
-    unsigned int p = 23;
+    unsigned int p = 17;
 
     printf("ciao pippo3 \n");
     
@@ -148,7 +167,7 @@ int main(){
 
     printf("ciao pippo5 \n"); 
 
-    //inizializza_pair(solution);
+    inizializza_pair(&solution);
 
     printf("ciao pippo6 \n");
 
@@ -162,7 +181,7 @@ int main(){
 
     printf("%d\n",pippo);
 
-    pippo = legendre_sol(n,p,solution);
+    pippo = legendre_sol(n,p,&solution);
 
     printf("ciao pippo9 \n");
 
