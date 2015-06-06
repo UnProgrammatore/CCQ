@@ -1,5 +1,7 @@
 #include "../include/linear_algebra.h"
 
+#include <omp.h>
+
 void modular_multiplication(mpz_t a, mpz_t b, mpz_t c, mpz_t n) {
   mpz_mul (a, b, c);
   mpz_mod (a, a, n);
@@ -78,6 +80,8 @@ void gaussian_elimination(unsigned int ** M_z,
     for(j = 0; j < n_row && wt[j].b_dx != i; ++j)
       ; // avanzo j e basta
 
+   
+    #pragma omp parallel for schedule(dynamic, n_row/4)
     for(unsigned k = j + 1; k < n_row; ++k) {
       if(get_k_i(M_z2, k, i)) { // il bit v(k)(i) deve essere a 1
 	add_vector_z2(M_z2, k, j, n_blocks); // v(k) = v(k) + v(j) mod 2
@@ -98,8 +102,8 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 		       struct row_stats * wt, // zeri sulle righe
 		       unsigned long n_row, // #fattorizzaz. complete
 		       unsigned long n_primes, // numero base di fattori
-		       mpz_t m, // fattore non banale di N
-		       mpz_t q) { // altro fattore non banale di N
+		       mpz_t m) { // fattore non banale di N
+
 
   mpz_t mpz_temp;
   mpz_init(mpz_temp);
@@ -112,6 +116,9 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 
   mpz_t Y;
   mpz_init(Y);
+
+  mpz_t q;
+  mpz_init(q);
 
   unsigned int exp;
 
@@ -138,16 +145,17 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
    
       mpz_gcd(m, X, N); // m = mcd(X + Y, N)    
 
-      mpz_divexact(q, N, m); // q = N / m;
+      //mpz_divexact(q, N, m); // q = N / m;
 
-      gmp_printf("%Zd * %Zd\n", m, q);
+      //gmp_printf("%Zd * %Zd\n", m, q);
 
-      if(mpz_cmp(m, N) < 0 &&  mpz_cmp_ui(m, 1) > 0) { // fatt. non banale
+      if(mpz_cmp(m, N) < 0 &&  mpz_cmp_ui(m, 1) > 0) {
 	++n_fatt_non_banali;
-	return 1;
+	//return 1;
       }
     }
-  return 0;
 
   mpz_clears(mpz_temp, mpz_prime, X, Y, NULL);
+
+  return n_fatt_non_banali;
 }

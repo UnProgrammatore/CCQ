@@ -7,7 +7,9 @@ unsigned int sieve(
 	pair* solutions,
 	unsigned int** exponents,
 	mpz_t* As,
-	unsigned int poly_val_num) {
+	unsigned int poly_val_num,
+	unsigned int max_fact
+	) {
 
 	mpz_t n_root;
 	mpz_t intermed;
@@ -20,6 +22,8 @@ unsigned int sieve(
 	mpz_t* evaluated_poly;
 
 	init_vector_mpz(& evaluated_poly, poly_val_num);
+
+	max_fact += base_dim;
 
 	// Trovo poly_val_num valori del polinomio (A + s)^2 - n, variando A
 	for(i = 0; i < poly_val_num; ++i) {
@@ -42,30 +46,41 @@ unsigned int sieve(
 				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);	
 			}
 			
-			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
+			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
 				++fact_count;
+				if(fact_count >= max_fact) {
+					i = base_dim;
+					j = poly_val_num; // Doppio break
+				}
+			}
 		}
 
 		// Faccio la stessa cosa con entrambe le soluzioni, a meno che non stia usando 2
-		if(factor_base[i] != 2) {
+		if(factor_base[i] != 2 && i != base_dim && j != poly_val_num) {
 			for(j = solutions[i].sol2; j < poly_val_num; j += factor_base[i]) {
 
 				while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
 					set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				}
-				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0)
-					++fact_count;			
+
+				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
+					++fact_count;
+					if(fact_count >= max_fact) {
+						i = base_dim;
+						j = poly_val_num; // Doppio break
+					}
+				}
 			}
 		}
 	}
-
-	);
 
 	mpz_clear(n_root);
 	mpz_clear(intermed);
 
 	remove_not_factorized(exponents, evaluated_poly, As, poly_val_num, base_dim);
+
+	//finalize_vector_mpz(evaluated_poly, poly_val_num);
 
 	return fact_count;
 }
