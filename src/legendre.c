@@ -1,4 +1,6 @@
-#include "legendre.h"
+#include "../include/legendre.h"
+#include <stdio.h>
+#include <math.h>
 
 
 // compile gcc legendre.c -std=c99 -lgmp -o legendre
@@ -48,37 +50,20 @@ int legendre(mpz_t n, unsigned int p ){
 
 int sol;
 mpz_t m;
-mpz_init(m)
+mpz_init(m);
 mpz_mod_ui(m,n,p); // m = n % p;
 
+unsigned int mm = mpz_get_ui(m);
+
   for (unsigned j = 0; 2 * j < p ; ++j){
-    if ((j*j) % p == m) {
+    if ((j*j) % p == mm) {
       return 1;
     }
   }
 
+  return 0;
 }
 
-/*
-int legendre(mpz_t n, unsigned int p ){
-
-  p = (p-1)/2;   // sono sicuro sia intero
-  mpz_t res;
-  mpz_init(res);
-  mpz_pow_ui(res, n, p);  // res = a^((p-1)/2)
-
-  mpz_mod_ui(res, res, p);
-
-  if(mpz_cmp_ui(res,0))
-    return 0;
-
-  if(mpz_cmp_ui(res,1))
-    return 1;
-
-  return -1;
-
-}
-*/
 
 
 
@@ -100,16 +85,21 @@ int legendre_sol(mpz_t n, unsigned int p, pair sol ){
   mpz_init(m);
   mpz_mod_ui(m,n,p);
 
-  mpz_t s;
-  mpz_init(s);
-  mpz_sqrt(s,n);
+  unsigned int mm = mpz_get_ui(m);
+ 
+  // s = sup(sqrt(n))
+  unsigned int n1 = mpz_get_ui(n);
+  float s1 = sqrt(n1);
+  s1 = ceil(s1);
+
+  unsigned int s = (unsigned int)(s1);
 
 
     // Data la simmetria delle soluzioni di "x^2 = n mod p" quando "p"
     // è dispari, è sufficiente esaminare i valori di "x"
     // nell'intervallo [0, (p - 1) / 2]
     for (unsigned j = 0; 2 * j < p ; ++j){
-      if ((j*j) % p == m) {
+      if ((j*j) % p == mm) {
       leg = 1;  
 
       // Se si entra qui vuol dire che "n" è un residuo quadratico
@@ -119,8 +109,12 @@ int legendre_sol(mpz_t n, unsigned int p, pair sol ){
       // accertarsi che la soluzione calcolata cada nell'intervallo
       // [0, p - 1], e per questo sono necessarie le operazioni di
       // modulo.
+
+      
       sol.sol1 = (p - ((s - j) % p)) % p;
       sol.sol2 = (p - ((j + s) % p)) % p;
+      
+
 
       return leg;
    }
@@ -129,14 +123,14 @@ int legendre_sol(mpz_t n, unsigned int p, pair sol ){
 
 }
 
-/*3
+
 int main(){
 
     printf("ciao pippo1 \n");
 
 	mpz_t n;
 	mpz_init(n);
-	mpz_set_ui(n,22);
+	mpz_set_ui(n,23);
 
     printf("ciao pippo2 \n");
 
@@ -158,7 +152,7 @@ int main(){
 
     printf("ciao pippo6 \n");
 
-    unsigned int pippo;
+    unsigned int pippo=-3;
 
     printf("ciao pippo7 \n");
 
@@ -168,6 +162,13 @@ int main(){
 
     printf("%d\n",pippo);
 
+    pippo = legendre_sol(n,p,solution);
+
+    printf("ciao pippo9 \n");
+
+    printf("%d\n",pippo);
+
+    printf("%d\n",solution.sol1);
+    printf("%d\n",solution.sol2);    
 
 }
-*/
