@@ -47,9 +47,6 @@ unsigned long quadratic_sieve(mpz_t N,
   init_matrix(& exponents, poly_val_num, n_primes);
   t2 = omp_get_wtime();
   double t_camp = t2 - t1;
-  for(int i = 0; i < poly_val_num; ++i)
-    for(int j = 0; j < n_primes; ++j)
-      set_matrix(exponents, i, j, 0);
   /* Vettore degli (Ai + s) */
  
 

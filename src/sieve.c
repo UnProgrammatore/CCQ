@@ -39,7 +39,7 @@ unsigned int sieve(
 		mpz_add_ui(intermed, n_root, i);
 		mpz_mul(intermed, intermed, intermed);
 		mpz_sub(evaluated_poly[i], intermed, n);
-
+		
 		mpz_add_ui(As[i], n_root, i);
 	}
 
