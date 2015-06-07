@@ -1,4 +1,7 @@
 #include "../include/sieve.h"
+#include "../include/linear_algebra.h"
+#include "../include/matrix.h"
+
 
 unsigned int sieve(
 	mpz_t n,
@@ -18,10 +21,16 @@ unsigned int sieve(
 	mpz_sqrt(n_root, n);
 
 	unsigned int fact_count = 0;
-	unsigned int i, j;
+	unsigned int i, j, k;
 	mpz_t* evaluated_poly;
 
 	init_vector_mpz(&evaluated_poly, poly_val_num);
+
+	word** is_used;
+	init_matrix_l(&is_used, 1, (poly_val_num / N_BITS) + 1);
+	for(i = 0; i < ((poly_val_num / N_BITS) + 1); ++i) {
+		set_matrix_l(is_used, 0, i, 0);
+	}
 
 	max_fact += base_dim;
 
@@ -42,6 +51,14 @@ unsigned int sieve(
 
 			// Divido e salvo l'esponente va bene
 			while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
+				
+				// Se non sono mai stati usati gli esponenti
+				if(get_k_i(is_used, 0, j) == 0) {
+					for(k = 0; k < base_dim; ++k)
+						set_matrix(exponents, j, k, 0);
+					set_k_i(is_used, 0, j, 1);
+				}
+				
 				set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 				mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);	
 			}
@@ -60,6 +77,14 @@ unsigned int sieve(
 			for(j = solutions[i].sol2; j < poly_val_num; j += factor_base[i]) {
 
 				while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
+					
+					// Se non sono mai stati usati gli esponenti
+					if(get_k_i(is_used, 0, j) == 0) {
+						for(k = 0; k < base_dim; ++k)
+							set_matrix(exponents, j, k, 0);
+						set_k_i(is_used, 0, j, 1);
+					}
+
 					set_matrix(exponents, j, i, get_matrix(exponents, j, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j], evaluated_poly[j], factor_base[i]);
 				}

@@ -114,11 +114,13 @@ int main() {
 
   unsigned int poly_val_num = 20000;//12800;
 
+  double t_pre_init = omp_get_wtime();
+
   unsigned int ** exponents;
   init_matrix(& exponents, poly_val_num, n_primes);
-  for(int i = 0; i < poly_val_num; ++i)
+  /*for(int i = 0; i < poly_val_num; ++i)
     for(int j = 0; j < n_primes; ++j)
-    set_matrix(exponents, i, j, 0);
+    set_matrix(exponents, i, j, 0);*/
   
   mpz_t * As;
   init_vector_mpz(& As, poly_val_num);
@@ -129,6 +131,7 @@ int main() {
 		 exponents, As, poly_val_num, 40);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
+  t_pre_init = t2 - t_pre_init;
 
   printf("numero fattorizzazioni complete trovate: %d\n", n_fatt);
 
@@ -177,9 +180,10 @@ int main() {
   else
     printf("Nessuna fattorizzazione non banale trovata\n\n");
   
-  printf("#time_base time_sieve time_gauss time_totale\n");
+  printf("#time_base time_sieve time_sieve_with_init time_gauss time_totale\n");
   printf("%.6f ", t_base);
   printf("%.6f ", t_sieve);
+  printf("%.6f ", t_pre_init);
   printf("%.6f ", t_gauss);
   printf("%.6f\n", t_base + t_gauss + t_sieve);
 }
