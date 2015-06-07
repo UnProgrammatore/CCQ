@@ -21,7 +21,7 @@ unsigned int sieve(
 	unsigned int i, j;
 	mpz_t* evaluated_poly;
 
-	init_vector_mpz(& evaluated_poly, poly_val_num);
+	init_vector_mpz(&evaluated_poly, poly_val_num);
 
 	max_fact += base_dim;
 
@@ -80,7 +80,8 @@ unsigned int sieve(
 
 	remove_not_factorized(exponents, evaluated_poly, As, poly_val_num, base_dim);
 
-	//finalize_vector_mpz(evaluated_poly, poly_val_num);
+	// finalize_vector_mpz(&evaluated_poly, poly_val_num);
+	// Si noti che questa istruzione apparentemente innocua porta all'uscita di demoni dal naso del programmatore
 
 	return fact_count;
 }
