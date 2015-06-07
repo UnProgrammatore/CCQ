@@ -17,8 +17,9 @@ void init_vector_mpz(mpz_t** vector, unsigned int n) {
 }
 
 void finalize_vector_mpz(mpz_t** vector, unsigned int n) {
-	for(; n > 0; --n)
-		mpz_clear((*vector)[n - 1]);
+	unsigned int i;
+	/*for(i = 0; i < n; ++i)
+		mpz_clear((*vector)[i]);*/
 	free(*vector);
 	*vector = 0;
 }
