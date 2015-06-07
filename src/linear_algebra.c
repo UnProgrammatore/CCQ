@@ -145,13 +145,13 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
    
       mpz_gcd(m, X, N); // m = mcd(X + Y, N)    
 
-      mpz_divexact(q, N, m); // q = N / m;
+      //mpz_divexact(q, N, m); // q = N / m;
 
-      gmp_printf("%Zd * %Zd\n", m, q);
+      //gmp_printf("%Zd * %Zd\n", m, q);
 
       if(mpz_cmp(m, N) < 0 &&  mpz_cmp_ui(m, 1) > 0) {
 	++n_fatt_non_banali;
-	//return 1;
+	return 1;
       }
     }
 

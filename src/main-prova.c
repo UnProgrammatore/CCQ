@@ -69,19 +69,23 @@ int main() {
   mpz_t P2;
   mpz_init(P2);
 
+  //mpz_set_str(P1, "1888888888", 10); 
+  //mpz_set_str(P2, "5245978939", 10); 
+
   mpz_set_str(P1, "1888888888", 10); 
-  mpz_set_str(P2, "5245978939", 10); 
+  mpz_set_str(P2, "5245978939", 10); 	
   mpz_mul(N, P1, P2);
 
   gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
 
   //mpz_set_str(N, "439389214701485110197221", 10); 
+  mpz_set_str(N, "304285060515912", 10); 
 
   mpz_t s;
   mpz_init(s);
   mpz_sqrt(s, N);
 
-  unsigned int n = 50000;
+  unsigned int n = 1000;
   unsigned int * numbers = malloc(sizeof(unsigned int) * n);
   unsigned n_all_primes = eratosthenes_sieve(numbers, n);
 
@@ -108,7 +112,7 @@ int main() {
     printf("%d\n", factor_base[i]);
   */
 
-  unsigned int poly_val_num = 300000;//12800;
+  unsigned int poly_val_num = 20000;//12800;
 
   unsigned int ** exponents;
   init_matrix(& exponents, poly_val_num, n_primes);
