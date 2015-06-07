@@ -2,6 +2,7 @@
 #include "../include/linear_algebra.h"
 #include "../include/matrix.h"
 
+#include <limits.h>
 
 unsigned int sieve(
 	mpz_t n,
@@ -66,14 +67,14 @@ unsigned int sieve(
 			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
 				++fact_count;
 				if(fact_count >= max_fact) {
-					i = base_dim;
-					j = poly_val_num; // Doppio break
+					i = UINT_MAX;
+					j = UINT_MAX; // Doppio break
 				}
 			}
 		}
 
 		// Faccio la stessa cosa con entrambe le soluzioni, a meno che non stia usando 2
-		if(factor_base[i] != 2 && i != base_dim && j != poly_val_num) {
+		if(factor_base[i] != 2 && i != UINT_MAX && j != UINT_MAX) {
 			for(j = solutions[i].sol2; j < poly_val_num; j += factor_base[i]) {
 
 				while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
@@ -92,8 +93,8 @@ unsigned int sieve(
 				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
 					++fact_count;
 					if(fact_count >= max_fact) {
-						i = base_dim;
-						j = poly_val_num; // Doppio break
+						i = UINT_MAX;
+						j = UINT_MAX; // Doppio break
 					}
 				}
 			}
