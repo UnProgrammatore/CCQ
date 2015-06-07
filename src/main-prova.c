@@ -126,7 +126,7 @@ int main() {
   unsigned int n_fatt;
   t1 = omp_get_wtime();
   n_fatt = sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num);
+		 exponents, As, poly_val_num, 40);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 
