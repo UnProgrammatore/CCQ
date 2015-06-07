@@ -11,11 +11,19 @@ OMP = -fopenmp
 USED_LIBS = $(GMP) $(OMP)
 INC = -I$(INC_DIR)
 
+#main1: $(EXE_DIR)/qs
+
+$(EXE_DIR)/qs: $(LIB_DIR)/eratostene.o $(LIB_DIR)/sieve.o $(LIB_DIR)/vector.o $(LIB_DIR)/matrix.o $(LIB_DIR)/linear_algebra.o $(LIB_DIR)/base_fattori.o $(LIB_DIR)/quadratic_sieve.o $(SRC_DIR)/main-qs.c
+	$(CC) $^ $(CC_ARGS) $(USED_LIBS) -o $@
+
 $(EXE_DIR)/main-prova: $(LIB_DIR)/eratostene.o $(LIB_DIR)/sieve.o $(LIB_DIR)/vector.o $(LIB_DIR)/matrix.o $(LIB_DIR)/linear_algebra.o $(LIB_DIR)/base_fattori.o $(SRC_DIR)/main-prova.c
 	$(CC) $^ $(CC_ARGS) $(USED_LIBS) -o $@
 
 $(EXE_DIR)/gaussian_elimination-con-main: $(LIB_DIR)/sieve.o $(LIB_DIR)/vector.o $(LIB_DIR)/matrix.o $(TEST_DIR)/gaussian_elimination-con-main.c
 	$(CC) $^ $(CC_ARGS) $(USED_LIBS) -o $@
+
+$(LIB_DIR)/quadratic_sieve.o: $(SRC_DIR)/quadratic_sieve.c
+	$(CC) $^ $(CC_ARGS) -c -o $@
 
 $(LIB_DIR)/eratostene.o: $(SRC_DIR)/eratostene.c
 	$(CC) $^ $(CC_ARGS) -c -o $@
