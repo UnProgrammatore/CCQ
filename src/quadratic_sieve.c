@@ -8,6 +8,11 @@ unsigned long quadratic_sieve(mpz_t N,
 			      mpz_t m) {
   double t1, t2;
   
+  if(mpz_probab_prime_p(N, 25)) {
+    printf("Il numero è un probabile primo\n");
+    return SOLO_FATTORIZZAZIONI_BANALI;
+  }
+
   mpz_t s;
   mpz_init(s);
   mpz_sqrt(s, N); 
