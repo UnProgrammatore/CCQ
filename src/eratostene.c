@@ -42,15 +42,16 @@ unsigned long eratosthenes_sieve(unsigned int * sieve,
 				 long unsigned n) {
 	unsigned long n_primes = 0;
 
-	for(long long unsigned i = 0; i < n; i++)
+	for(long unsigned i = 0; i < n; i++)
     		sieve[i] = 1;
-	for(long long unsigned i = 2; i < n; i++){
+	for(long unsigned i = 2; i < n; i++){
 		if(i*i > n)
       			break;
     		if(sieve[i] == 1) {
 			++n_primes;
-      			for(long long unsigned j = i; i*j <= n; j++)
+      			for(long unsigned j = i; i*j < n; j++)
 				sieve[i*j] = 0;
 		}  
 	}
+	return n_primes;
 }
