@@ -8,6 +8,11 @@ unsigned long quadratic_sieve(mpz_t N,
 			      mpz_t m) {
   double t1, t2;
   
+  if(mpz_probab_prime_p(N, 25)) {
+    printf("Il numero è un probabile primo\n");
+    return SOLO_FATTORIZZAZIONI_BANALI;
+  }
+
   mpz_t s;
   mpz_init(s);
   mpz_sqrt(s, N); 
@@ -25,8 +30,11 @@ unsigned long quadratic_sieve(mpz_t N,
     }
   unsigned n_all_primes = j;
 
-  for(int i = 0; i < j; ++i)
-    printf("%d\n", primes[i]);
+  unsigned int fattore_semplice = trivial_fact(N, primes, n_all_primes);
+  if(fattore_semplice != 0) {
+    mpz_set_ui(m, fattore_semplice);
+    return OK;
+  }
 
   /* Calcolo base di fattori e soluzioni dell'eq x^2 = N mod p */
   pair * solutions = malloc(sizeof(pair) * n_all_primes);

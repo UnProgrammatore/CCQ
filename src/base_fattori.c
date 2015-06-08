@@ -68,7 +68,7 @@ long unsigned base_fattori(mpz_t numero, mpz_t radice, unsigned int base_fattori
 		}
 	}
 
-	mpz_clear(soluzione);
+	//mpz_clear(soluzione);
 
 	return k;
 }

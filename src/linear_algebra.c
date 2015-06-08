@@ -74,24 +74,53 @@ void gaussian_elimination(unsigned int ** M_z,
 				unsigned long n_col,
 				unsigned long n_blocks,
 				struct row_stats wt[]) {
+  double t1, t2;
+  double t_Z2 = 0;
+  double t_Z = 0;
+  double t_As = 0;
+  double t_get_wt = 0;
 
- for(unsigned long i = 0; i < n_col; ++i) {
+  for(unsigned long i = 0; i < n_col; ++i) {
     unsigned long j;
     for(j = 0; j < n_row && wt[j].b_dx != i; ++j)
       ; // avanzo j e basta
 
    
-    #pragma omp parallel for schedule(dynamic, n_row/4)
+    //#pragma omp parallel for schedule(dynamic, n_row/4)
     for(unsigned k = j + 1; k < n_row; ++k) {
       if(get_k_i(M_z2, k, i)) { // il bit v(k)(i) deve essere a 1
+	t1 = omp_get_wtime();
 	add_vector_z2(M_z2, k, j, n_blocks); // v(k) = v(k) + v(j) mod 2
+	t2 = omp_get_wtime();
+  	t_Z2 += (t2 - t1);
+
+	t1 = omp_get_wtime();
 	add_vector_z(M_z, k, j, n_col); // v(k) = v(k) + v(j)
+	t2 = omp_get_wtime();
+	t_Z += (t2 - t1);
+
 	// (A_k + s) = (A_k + s) * (A_j + s)
+	
+	t1 = omp_get_wtime();
 	modular_multiplication(As[k], As[k], As[j], N); 
+	t2 = omp_get_wtime();	
+	t_As += (t2 - t1);
+	
+	t1 = omp_get_wtime();
 	get_wt_k(M_z2, k, n_col, & wt[k]); // aggiorno wt
+	t2 = omp_get_wtime();      
+      	t_get_wt += (t2 - t1);
       }
     }
   }
+
+  printf("#t_Z2 t_Z t_As t_get_wt t_tot\n");
+  printf("%.6f ", t_Z2);
+  printf("%.6f ", t_Z);
+  printf("%.6f ", t_As);
+  printf("%.6f ", t_get_wt);
+  printf("%.6f\n", t_Z2 + t_Z + t_As + t_get_wt);
+	
 }
 
 unsigned factorization(mpz_t N, // numero da fattorizzare
@@ -140,18 +169,30 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 	modular_multiplication(Y, Y, mpz_temp, N);
       }
 
+      //mpz_t X_sub;
+      //mpz_init(X_sub);
+      //mpz_t m2;
+      //mpz_init(m2);
+
       mpz_set(X, As[i]);
+
+      //mpz_sub(X_sub, X, Y);
+
       mpz_add(X, X, Y); // X = X + Y
    
-      mpz_gcd(m, X, N); // m = mcd(X + Y, N)    
+      mpz_gcd(m, X, N); // m = mcd(X + Y, N)  
+      //mpz_gcd(m2, X, N); // m = mcd(X - Y, N)
 
-      //mpz_divexact(q, N, m); // q = N / m;
+      //gmp_printf("X+Y: (%Zd, %Zd) = %Zd,\t", X, Y, m);
+      //gmp_printf("X-Y: (%Zd, %Zd) = %Zd\n", X_sub, Y, m2);
+
+      mpz_divexact(q, N, m); // q = N / m;
 
       //gmp_printf("%Zd * %Zd\n", m, q);
 
-      if(mpz_cmp(m, N) < 0 &&  mpz_cmp_ui(m, 1) > 0) {
+      if(mpz_cmp(m, N) < 0 && mpz_cmp_ui(m, 1) > 0) {
 	++n_fatt_non_banali;
-	return 1;
+	//return 1;
       }
     }
 
