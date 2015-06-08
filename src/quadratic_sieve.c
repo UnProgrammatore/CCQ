@@ -25,18 +25,21 @@ unsigned long quadratic_sieve(mpz_t N,
     }
   unsigned n_all_primes = j;
 
+  for(int i = 0; i < j; ++i)
+    printf("%d\n", primes[i]);
+
   /* Calcolo base di fattori e soluzioni dell'eq x^2 = N mod p */
   pair * solutions = malloc(sizeof(pair) * n_all_primes);
   unsigned int * factor_base = primes;
-    //malloc(sizeof(unsigned int) * n_all_primes); 
+	// malloc(sizeof(unsigned int) * n_all_primes); 
 
   unsigned n_primes = base_fattori(N, s, factor_base, solutions,
 				  primes, n_all_primes);
   t2 = omp_get_wtime();
   double t_base = t2 - t1;
 
-  //for(int i = 0; i < n_primes; ++i)
-  //  printf("%d\n", factor_base[i]);
+  for(int i = 0; i < n_primes; ++i)
+    printf("%d\n", factor_base[i]);
  
   printf("dimensione base di fattori: %d\n", n_primes);
 
@@ -59,7 +62,7 @@ unsigned long quadratic_sieve(mpz_t N,
 
  
   n_fatt = sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num, 10);
+		 exponents, As, poly_val_num, 1);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 
