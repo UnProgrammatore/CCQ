@@ -25,6 +25,12 @@ unsigned long quadratic_sieve(mpz_t N,
     }
   unsigned n_all_primes = j;
 
+  unsigned int fattore_semplice = trivial_fact(N, primes, n_all_primes);
+  if(fattore_semplice != 0) {
+    mpz_set_ui(m, fattore_semplice);
+    return OK;
+  }
+
   /* Calcolo base di fattori e soluzioni dell'eq x^2 = N mod p */
   pair * solutions = malloc(sizeof(pair) * n_all_primes);
   unsigned int * factor_base = primes;

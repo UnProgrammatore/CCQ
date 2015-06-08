@@ -6,6 +6,7 @@
 #include "../include/sieve.h"
 #include "../include/matrix.h"
 #include "../include/base_fattori.h"
+#include "../include/trivial_fact.h"
 
 #include <omp.h>
 #include <gmp.h>
