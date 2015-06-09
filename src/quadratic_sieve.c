@@ -9,14 +9,13 @@ unsigned long quadratic_sieve(mpz_t N,
   double t1, t2;
   
   if(mpz_probab_prime_p(N, 25)) {
-    printf("Il numero è un probabile primo\n");
-    return SOLO_FATTORIZZAZIONI_BANALI;
+    //printf("Il numero è un probabile primo\n");
+    return NUM_PRIMO;
   }
 
   mpz_t s;
   mpz_init(s);
   mpz_sqrt(s, N); 
-
 
   t1 = omp_get_wtime();
   /* Individuazione primi in [2, n] */
@@ -28,13 +27,17 @@ unsigned long quadratic_sieve(mpz_t N,
     if(primes[i] == 1) {
       primes[j++] = i;
     }
-  unsigned n_all_primes = j;
 
-  unsigned int fattore_semplice = trivial_fact(N, primes, n_all_primes);
-  if(fattore_semplice != 0) {
-    mpz_set_ui(m, fattore_semplice);
+  unsigned int n_all_primes = j;
+
+  unsigned int simple_factor = trivial_fact(N, primes, n_all_primes);
+  if(simple_factor != 0) {
+    mpz_set_ui(m, simple_factor);
     return OK;
   }
+
+  //for(int i = 0; i < n_all_primes; ++i)
+  //  printf("p) %d\n", primes[i]);
 
   /* Calcolo base di fattori e soluzioni dell'eq x^2 = N mod p */
   pair * solutions = malloc(sizeof(pair) * n_all_primes);
@@ -46,21 +49,16 @@ unsigned long quadratic_sieve(mpz_t N,
   t2 = omp_get_wtime();
   double t_base = t2 - t1;
 
-  for(int i = 0; i < n_primes; ++i)
-    printf("%d\n", factor_base[i]);
+  //for(int i = 0; i < n_primes; ++i)
+  // printf("fb) %d\n", factor_base[i]);
  
   printf("dimensione base di fattori: %d\n", n_primes);
 
- 
   /* Vettore degli esponenti in Z */
-  t1 = omp_get_wtime();
   unsigned int ** exponents;
   init_matrix(& exponents, poly_val_num, n_primes);
-  t2 = omp_get_wtime();
-  double t_camp = t2 - t1;
   /* Vettore degli (Ai + s) */
  
-
   t1 = omp_get_wtime();
   mpz_t * As;
   init_vector_mpz(& As, poly_val_num);
@@ -68,7 +66,6 @@ unsigned long quadratic_sieve(mpz_t N,
   /* Parte di crivello: troviamo le k+n fattorizzazioni complete */
   unsigned int n_fatt;
 
- 
   n_fatt = sieve(N, factor_base, n_primes, solutions, 
 		 exponents, As, poly_val_num, 1);
   t2 = omp_get_wtime();
@@ -111,9 +108,8 @@ unsigned long quadratic_sieve(mpz_t N,
   printf("%.6f ", t_base);
   printf("%.6f ", t_sieve);
   printf("%.6f ", t_gauss);
-  printf("%.6f ", t_camp);
   //double t_camp = 0;
-  printf("%.6f\n", t_base + t_gauss + t_sieve + t_camp);
+  printf("%.6f\n", t_base + t_gauss + t_sieve);
 
   if(n_fact_non_banali > 0) {
     /* Pulizia della memoria */
