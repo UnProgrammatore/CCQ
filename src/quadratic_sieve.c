@@ -70,7 +70,7 @@ unsigned long quadratic_sieve(mpz_t N,
 
  
   n_fatt = sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num, 10);
+		 exponents, As, poly_val_num, 2);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 
