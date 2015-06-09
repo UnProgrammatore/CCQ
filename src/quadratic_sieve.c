@@ -41,6 +41,8 @@ unsigned long quadratic_sieve(mpz_t N,
   unsigned int * factor_base = primes;
     //malloc(sizeof(unsigned int) * n_all_primes); 
 
+  unsigned int max_fact = 10000; // MODIFICARE QUESTO
+
   unsigned n_primes = base_fattori(N, s, factor_base, solutions,
 				  primes, n_all_primes);
   t2 = omp_get_wtime();
@@ -55,7 +57,7 @@ unsigned long quadratic_sieve(mpz_t N,
   /* Vettore degli esponenti in Z */
   t1 = omp_get_wtime();
   unsigned int ** exponents;
-  init_matrix(& exponents, poly_val_num, n_primes);
+  init_matrix(& exponents, n_primes + max_fact, n_primes);
   t2 = omp_get_wtime();
   double t_camp = t2 - t1;
   /* Vettore degli (Ai + s) */
@@ -63,14 +65,14 @@ unsigned long quadratic_sieve(mpz_t N,
 
   t1 = omp_get_wtime();
   mpz_t * As;
-  init_vector_mpz(& As, poly_val_num);
+  init_vector_mpz(& As, n_primes + max_fact);
 
   /* Parte di crivello: troviamo le k+n fattorizzazioni complete */
   unsigned int n_fatt;
 
  
-  n_fatt = sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num, 2);
+  n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
+		 exponents, As, poly_val_num, max_fact, 1000);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 

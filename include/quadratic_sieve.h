@@ -3,10 +3,10 @@
 
 #include "../include/linear_algebra.h"
 #include "../include/vector.h"
-#include "../include/sieve.h"
 #include "../include/matrix.h"
 #include "../include/base_fattori.h"
 #include "../include/trivial_fact.h"
+#include "../include/smart_sieve.h"
 
 #include <omp.h>
 #include <gmp.h>
