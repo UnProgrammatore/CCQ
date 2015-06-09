@@ -14,7 +14,7 @@
 enum qs_error_codes{
   OK,
   SOLO_FATTORIZZAZIONI_BANALI,
-  
+  NUM_PRIMO  
 };
 
 unsigned long quadratic_sieve(mpz_t N, 

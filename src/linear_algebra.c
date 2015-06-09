@@ -2,6 +2,30 @@
 
 #include <omp.h>
 
+
+void print_bits(word a) {
+  unsigned int bits[N_BITS];
+
+  for(unsigned int i = 0; i < N_BITS; ++i)
+    bits[i] = (a >> i) & 1U;
+
+  for(int i = 63; i >= 0; --i)
+    printf("%d", bits[i]);
+}
+
+void print_all(unsigned long **M, int righe, int blocchi){
+  for(int i = 0; i < righe; ++i) {
+    for(int j = 0; j < blocchi; ++j) {
+      print_bits(get_matrix_l(M, i, j));
+      printf(" ");
+    }
+    printf("\n");
+  }
+}
+
+
+
+
 void modular_multiplication(mpz_t a, mpz_t b, mpz_t c, mpz_t n) {
   mpz_mul (a, b, c);
   mpz_mod (a, a, n);
@@ -80,6 +104,9 @@ void gaussian_elimination(unsigned int ** M_z,
   double t_As = 0;
   double t_get_wt = 0;
 
+  //print_all(M_z2, n_row, n_blocks);
+  //printf("\n\n");
+
   for(unsigned long i = 0; i < n_col; ++i) {
     unsigned long j;
     for(j = 0; j < n_row && wt[j].b_dx != i; ++j)
@@ -110,9 +137,14 @@ void gaussian_elimination(unsigned int ** M_z,
 	get_wt_k(M_z2, k, n_col, & wt[k]); // aggiorno wt
 	t2 = omp_get_wtime();      
       	t_get_wt += (t2 - t1);
+
+	
       }
     }
   }
+
+  //print_all(M_z2, n_row, n_blocks);
+  //printf("\n");
 
   printf("#t_Z2 t_Z t_As t_get_wt t_tot\n");
   printf("%.6f ", t_Z2);
@@ -188,13 +220,15 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 
       mpz_divexact(q, N, m); // q = N / m;
 
-      //gmp_printf("%Zd * %Zd\n", m, q);
+      gmp_printf("%Zd * %Zd\n", m, q);
 
       if(mpz_cmp(m, N) < 0 && mpz_cmp_ui(m, 1) > 0) {
 	++n_fatt_non_banali;
 	//return 1;
       }
     }
+
+  printf("n_dip = %d\n", n_dip);
 
   mpz_clears(mpz_temp, mpz_prime, X, Y, NULL);
 

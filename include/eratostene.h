@@ -1,12 +1,9 @@
-/* Crivello di eratostene parallelo (openmp).
+/* Crivello di eratostene.
+ * Trova i numeri primi in [2, n).
  * Parametri:
- * 	"int * sieve": array di int di lunghezza almeno n/2 opportunamente
+ * 	"int * sieve": array di int di lunghezza almeno n opportunamente
  *  	allocato dal chiamante nel quale saranno marchiati con "1" i
- * 		numeri dispari primi. NOTA BENE: "sieve[i] = 1" indica che il
- * 		numero "(i * 2) + 1" è primo (sieve contiene solo numeri dispari)
- *  "long unsigned n": numero fino al quale si desidera calcolare i primi
- *  Compilazione:
- * 		$ gcc -c -lgmp -fopenmp -o eratostene.o eratostene.c
+ *      primi.
  */
 
 #ifndef ERATOSTENE_H
@@ -15,6 +12,6 @@
 #include <stdlib.h>
 #include <omp.h>
 
-unsigned long eratosthenes_sieve(unsigned int * sieve, long unsigned n);
+void eratosthenes_sieve(unsigned int * sieve, long unsigned n);
 
 #endif // ERATOSTENE_H

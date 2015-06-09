@@ -2,8 +2,6 @@
 #include "../include/linear_algebra.h"
 #include "../include/matrix.h"
 
-#include <limits.h>
-
 unsigned int sieve(
 	mpz_t n,
 	unsigned int* factor_base,
@@ -20,6 +18,8 @@ unsigned int sieve(
 	mpz_init(n_root);
 	mpz_init(intermed);
 	mpz_sqrt(n_root, n);
+
+	unsigned char go_on = 1;
 
 	unsigned int fact_count = 0;
 	unsigned int i, j, k;
@@ -45,10 +45,10 @@ unsigned int sieve(
 	}
 
 	// Per ogni primo nella base di fattori
-	for(i = 0; i < base_dim; ++i) {
+	for(i = 0; i < base_dim && go_on; ++i) {
 
 		// Provo tutte le possibili fattorizzazioni nella base di fattori
-		for(j = solutions[i].sol1; j < poly_val_num; j += factor_base[i]) {
+		for(j = solutions[i].sol1; j < poly_val_num && go_on; j += factor_base[i]) {
 
 			// Divido e salvo l'esponente va bene
 			while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
@@ -67,15 +67,14 @@ unsigned int sieve(
 			if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
 				++fact_count;
 				if(fact_count >= max_fact) {
-					i = UINT_MAX;
-					j = UINT_MAX; // Doppio break
+					go_on = 0;
 				}
 			}
 		}
 
 		// Faccio la stessa cosa con entrambe le soluzioni, a meno che non stia usando 2
-		if(factor_base[i] != 2 && i != UINT_MAX && j != UINT_MAX) {
-			for(j = solutions[i].sol2; j < poly_val_num; j += factor_base[i]) {
+		if(factor_base[i] != 2) {
+			for(j = solutions[i].sol2; j < poly_val_num && go_on; j += factor_base[i]) {
 
 				while(mpz_divisible_ui_p(evaluated_poly[j], factor_base[i])) {
 					
@@ -93,8 +92,7 @@ unsigned int sieve(
 				if(mpz_cmp_ui(evaluated_poly[j], 1) == 0) {
 					++fact_count;
 					if(fact_count >= max_fact) {
-						i = UINT_MAX;
-						j = UINT_MAX; // Doppio break
+						go_on = 0;
 					}
 				}
 			}

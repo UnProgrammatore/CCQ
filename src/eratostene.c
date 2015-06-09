@@ -38,7 +38,7 @@ unsigned long eratosthenes_sieve(unsigned int * sieve,
 }
 */
 
-unsigned long eratosthenes_sieve(unsigned int * sieve, 
+void eratosthenes_sieve(unsigned int * sieve, 
 				 long unsigned n) {
 	unsigned long n_primes = 0;
 
@@ -48,10 +48,8 @@ unsigned long eratosthenes_sieve(unsigned int * sieve,
 		if(i*i > n)
       			break;
     		if(sieve[i] == 1) {
-			++n_primes;
       			for(long unsigned j = i; i*j < n; j++)
 				sieve[i*j] = 0;
 		}  
 	}
-	return n_primes;
 }
