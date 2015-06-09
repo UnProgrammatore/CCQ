@@ -15,15 +15,8 @@ unsigned int smart_sieve(
 	unsigned int** exponents, // Il vettore di vettori degli esponenti
 	mpz_t* As, // Vettore in cui verranno salvati i valori di (A + s)
 	unsigned int poly_val_num, // Il numero di valori di A che si vogliono provare nel polinomio
-	unsigned int max_fact // max_fact + base_dim = massime fattorizzazioni
-	);
-
-unsigned int remove_not_factorized(
-	unsigned int** exponents,
-	mpz_t* reduced_q_a,
-	mpz_t* As,
-	unsigned int howmany,
-	unsigned int primes_num
+	unsigned int max_fact, // max_fact + base_dim = massime fattorizzazioni
+	unsigned int intervals
 	);
 
 #endif // SIEVE_GUARD

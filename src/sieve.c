@@ -10,8 +10,19 @@ unsigned int sieve(
 	unsigned int** exponents,
 	mpz_t* As,
 	unsigned int poly_val_num,
-	unsigned int max_fact
+	unsigned int max_fact,
+	unsigned int intervals
 	) {
+
+	unsigned int i;
+
+	unsigned int** expo2;
+	init_matrix(&expo2, intervals, base_dim);
+	word** is_used_expo2;
+	init_matrix_l(&is_used_expo2, 1, (intervals / N_BITS) + 1);
+	for(i = 0; i < ((intervals / N_BITS) + 1); ++i) {
+		set_matrix_l(is_used_expo2, 0, i, 0);
+	}
 
 	mpz_t n_root;
 	mpz_t intermed;
@@ -22,7 +33,7 @@ unsigned int sieve(
 	unsigned char go_on = 1;
 
 	unsigned int fact_count = 0;
-	unsigned int i, j, k;
+	unsigned int j, k;
 	mpz_t* evaluated_poly;
 
 	init_vector_mpz(&evaluated_poly, poly_val_num);
