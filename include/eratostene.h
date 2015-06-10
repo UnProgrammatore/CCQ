@@ -8,7 +8,6 @@
  * numero "i" è primo 
  * Compilazione:
  * 		$ gcc -c -lgmp -fopenmp -o eratostene.o eratostene.c
->>>>>>> 60b860d79450927c9a8fb282afcc0decb489e370
  */
 
 #ifndef ERATOSTENE_H
