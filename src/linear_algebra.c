@@ -125,7 +125,7 @@ void gaussian_elimination(unsigned int ** M_z,
 	add_vector_z(M_z, k, j, n_col); // v(k) = v(k) + v(j)
 	t2 = omp_get_wtime();
 	t_Z += (t2 - t1);
-
+	
 	// (A_k + s) = (A_k + s) * (A_j + s)
 	
 	t1 = omp_get_wtime();
@@ -138,10 +138,14 @@ void gaussian_elimination(unsigned int ** M_z,
 	t2 = omp_get_wtime();      
       	t_get_wt += (t2 - t1);
 
-	
       }
     }
   }
+
+  for(unsigned int u = 0; u < 10/*n_col*/; ++u) {
+    printf("%u ", get_matrix(M_z, n_row-1, u));
+  }
+  printf("\n");
 
   //print_all(M_z2, n_row, n_blocks);
   //printf("\n");

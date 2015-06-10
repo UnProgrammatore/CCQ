@@ -44,7 +44,7 @@ unsigned long quadratic_sieve(mpz_t N,
   unsigned int * factor_base = primes;
 	// malloc(sizeof(unsigned int) * n_all_primes); 
 
-  unsigned int max_fact = 10000; // MODIFICARE QUESTO
+  unsigned int max_fact = 100000000; // MODIFICARE QUESTO
 
   unsigned n_primes = base_fattori(N, s, factor_base, solutions,
 				  primes, n_all_primes);
