@@ -26,6 +26,31 @@ int main() {
 	get_matrix_mpz(val, matrice, 3, 2);
 	gmp_printf("Ho letto %Zd\n", val);
 
+	printf("Scrivo sul bordo\n");
+	mpz_set_str(mp, "111", 10);
+	set_matrix_mpz(matrice, 4, 4, mp);
+
+	printf("Leggo dal bordo\n");
+	get_matrix_mpz(val, matrice, 4, 4);
+	gmp_printf("Letto dal bordo %Zd\n", val);
+
+	printf("Scrivo su 0 0\n");
+	mpz_set_str(mp, "999", 10);
+	set_matrix_mpz(matrice, 0, 0, mp);
+
+	printf("Leggo da 0 0\n");
+	get_matrix_mpz(val, matrice, 0, 0);
+	gmp_printf("Letto dal bordo %Zd\n", val);
+	
+
+	printf("Scrivo un numerone su 4 4");
+	mpz_set_str(mp, "48684452497254157854275812471527415472541674157424", 10);
+	set_matrix_mpz(matrice, 4, 4, mp);
+
+	printf("Leggo da 4 4 il numerone\n");
+	get_matrix_mpz(val, matrice, 4, 4);
+	gmp_printf("Letto da 4 4 %Zd\n", val);
+	/*
 	ui = 5;
 
 	printf("Coso ui altro\n");
@@ -36,6 +61,6 @@ int main() {
 	
 	printf("Sto per leggere l'ui\n");
 	get_matrix_mpz(val, matrice, 2, 1);
-	gmp_printf("In 2, 2 ho %Zd\n", val);
+	gmp_printf("In 2, 2 ho %Zd\n", val);*/
 
 }

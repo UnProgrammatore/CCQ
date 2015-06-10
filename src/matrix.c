@@ -52,9 +52,11 @@ void set_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y, unsign
 
 void init_matrix_mpz(mpz_t*** matrix, unsigned int x, unsigned int y) {
 	*matrix = (mpz_t**) malloc(y * sizeof(mpz_t*));
+	unsigned int i;
 	for(; y > 0; --y) {
 		(*matrix)[y - 1] = malloc(x * sizeof(mpz_t));
-		mpz_init(((*matrix)[y - 1])[x]);
+		for(i = 0; i < x; ++i)
+			mpz_init(((*matrix)[y - 1])[i]);
 	}
 }
 
