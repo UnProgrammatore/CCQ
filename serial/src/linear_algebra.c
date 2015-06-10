@@ -172,6 +172,4 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
   printf("n_dip = %d\n", n_dip);
 
   mpz_clears(mpz_temp, exp, q, mpz_prime, X, Y, NULL);
-
-  return n_fatt_non_banali;
 }

@@ -47,7 +47,7 @@ unsigned long quadratic_sieve(mpz_t N,
 				  primes, n_all_primes);
   t2 = omp_get_wtime();
   double t_base = t2 - t1; 
-  printf("dimensione base di fattori: %d\n", n_primes);
+  printf("#dimensione base di fattori: %d\n", n_primes);
 
   /* Vettore degli esponenti in Z */
   unsigned int ** exponents;
@@ -68,7 +68,7 @@ unsigned long quadratic_sieve(mpz_t N,
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 
-  printf("numero fattorizzazioni complete trovate: %d\n", n_fatt);
+  printf("#numero fattorizzazioni complete trovate: %d\n", n_fatt);
 
   t1 = omp_get_wtime();
   /* Matrice di esponenti in Z_2 organizzata a blocchi di bit */ 
@@ -90,7 +90,6 @@ unsigned long quadratic_sieve(mpz_t N,
 
   /* In gauss gli esponenti sommati possono andare in overflow,
      li converto dunque in mpz */
-  printf("crasha subito dopo\n");
   mpz_t ** exponents_mpz;
   mpz_t temp;
   mpz_init_set_ui(temp, 2);
@@ -104,7 +103,6 @@ unsigned long quadratic_sieve(mpz_t N,
       set_matrix_mpz(exponents_mpz, i, j, temp);
     }
   
-  printf("gaussian elimination\n");
   /* Eliminazione gaussiana */
   gaussian_elimination(exponents_mpz, M, As, N, 
 		       n_fatt, n_primes, n_blocchi, wt);
