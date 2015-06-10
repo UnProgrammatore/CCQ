@@ -49,3 +49,19 @@ unsigned long get_matrix_l(unsigned long** matrix, unsigned int x, unsigned int 
 void set_matrix_l(unsigned long** matrix, unsigned int x, unsigned int y, unsigned long value) {
 	(matrix[y])[x] = value;
 }
+
+void init_matrix_mpz(mpz_t*** matrix, unsigned int x, unsigned int y) {
+	*matrix = (mpz_t**) malloc(y * sizeof(mpz_t*));
+	for(; y > 0; --y) {
+		(*matrix)[y - 1] = malloc(x * sizeof(mpz_t));
+		mpz_init(((*matrix)[y - 1])[x]);
+	}
+}
+
+void get_matrix_mpz(mpz_t value, mpz_t** matrix, unsigned int x, unsigned int y) {
+	mpz_set(value, (matrix[y])[x]);
+}
+
+void set_matrix_mpz(mpz_t** matrix, unsigned int x, unsigned int y, mpz_t value) {
+	mpz_set((matrix[y])[x], value);
+}
