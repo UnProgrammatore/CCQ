@@ -22,6 +22,9 @@ $(EXE_DIR)/main-prova: $(LIB_DIR)/eratostene.o $(LIB_DIR)/sieve.o $(LIB_DIR)/vec
 $(EXE_DIR)/gaussian_elimination-con-main: $(LIB_DIR)/sieve.o $(LIB_DIR)/vector.o $(LIB_DIR)/matrix.o $(TEST_DIR)/gaussian_elimination-con-main.c
 	$(CC) $^ $(CC_ARGS) $(USED_LIBS) -o $@
 
+$(EXE_DIR)/prova_le_altre_matrix: $(LIB_DIR)/matrix.o $(SRC_DIR)/prova_le_altre_matrix.c
+	$(CC) $^ $(CC_ARGS) $(USED_LIBS) -o $@
+
 $(LIB_DIR)/trivial_fact.o: $(SRC_DIR)/trivial_fact.c
 	$(CC) $^ $(CC_ARGS) -c -o $@
 
