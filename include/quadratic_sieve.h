@@ -11,15 +11,18 @@
 #include <omp.h>
 #include <gmp.h>
 
+/* Stati ritornati dall'algoritmo */
 enum qs_error_codes{
-  OK,
-  SOLO_FATTORIZZAZIONI_BANALI,
-  NUM_PRIMO  
+  OK, // L'algortimo ha trovato una fattorizzazione non banale
+  SOLO_FATTORIZZAZIONI_BANALI, // Nessuna fattorizzazione non banale trovata
+  NUM_PRIMO // N su cui si lancia l'algortimo è primo
 };
 
-unsigned long quadratic_sieve(mpz_t N, 
-			      unsigned int n, 
-			      unsigned int poly_val_num,
-			      mpz_t m);
+unsigned long quadratic_sieve(mpz_t N, // Numero da fattorizzare
+			      unsigned int n, // Parametro per il crivello di eratostene
+			      unsigned int poly_val_num, // A in [0, poly_val_num]
+			      unsigned int max_fact, // Numero di fatt. complete da trovare
+			      unsigned int interval, // Numero di intervalli in cui spezzare sieve
+			      mpz_t m); // Fattore primo eventualmente trovato
 
 #endif // QUADRATIC_SIEVE_H

@@ -5,14 +5,17 @@
 unsigned long quadratic_sieve(mpz_t N, 
 			      unsigned int n, 
 			      unsigned int poly_val_num,
+			      unsigned int max_fact,
+			      unsigned int interval,
 			      mpz_t m) {
   double t1, t2;
   
+  /* Controllo con test di pseudoprimalità di rabin */
   if(mpz_probab_prime_p(N, 25)) {
-    //printf("Il numero è un probabile primo\n");
     return NUM_PRIMO;
   }
 
+  /* Radice intera di N */
   mpz_t s;
   mpz_init(s);
   mpz_sqrt(s, N); 
@@ -36,24 +39,14 @@ unsigned long quadratic_sieve(mpz_t N,
     return OK;
   }
 
-  //for(int i = 0; i < n_all_primes; ++i)
-  //  printf("p) %d\n", primes[i]);
-
   /* Calcolo base di fattori e soluzioni dell'eq x^2 = N mod p */
   pair * solutions = malloc(sizeof(pair) * n_all_primes);
   unsigned int * factor_base = primes;
-	// malloc(sizeof(unsigned int) * n_all_primes); 
-
-  unsigned int max_fact = 100000000; // MODIFICARE QUESTO
 
   unsigned n_primes = base_fattori(N, s, factor_base, solutions,
 				  primes, n_all_primes);
   t2 = omp_get_wtime();
-  double t_base = t2 - t1;
-
-  //for(int i = 0; i < n_primes; ++i)
-  // printf("fb) %d\n", factor_base[i]);
- 
+  double t_base = t2 - t1; 
   printf("dimensione base di fattori: %d\n", n_primes);
 
   /* Vettore degli esponenti in Z */
@@ -71,7 +64,7 @@ unsigned long quadratic_sieve(mpz_t N,
   unsigned int n_fatt;
  
   n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num, max_fact, 1000);
+		 exponents, As, poly_val_num, max_fact, interval);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 
@@ -86,7 +79,7 @@ unsigned long quadratic_sieve(mpz_t N,
   init_matrix_l(& M, n_fatt, n_blocchi);
   for(int i = 0; i < n_fatt; ++i)
     for(int j = 0; j < n_primes; ++j) {
-      unsigned int a = get_matrix(exponents, i, j); 
+      unsigned int a = get_matrix(exponents, i, j);
       set_k_i(M, i, j, a);
     }
 
@@ -95,48 +88,47 @@ unsigned long quadratic_sieve(mpz_t N,
   for(int i = 0; i < n_fatt; ++i)
     get_wt_k(M, i, n_primes, & wt[i]);
 
-  /* Eliminazione gaussiana */
+  /* In gauss gli esponenti sommati possono andare in overflow,
+     li converto dunque in mpz */
+  printf("crasha subito dopo\n");
+  mpz_t ** exponents_mpz;
+  mpz_t temp;
+  mpz_init_set_ui(temp, 2);
+
+  unsigned int a; 
+  init_matrix_mpz(& exponents_mpz, n_fatt, n_primes);
+  for(unsigned i = 0; i < n_fatt; ++i)
+    for(unsigned j = 0; j < n_primes; ++j) {
+      a = get_matrix(exponents, i, j);
+      mpz_set_ui(temp, a);
+      set_matrix_mpz(exponents_mpz, i, j, temp);
+    }
   
-  gaussian_elimination(exponents, M, As, N, 
-		     n_fatt, n_primes, n_blocchi, wt);
+  printf("gaussian elimination\n");
+  /* Eliminazione gaussiana */
+  gaussian_elimination(exponents_mpz, M, As, N, 
+		       n_fatt, n_primes, n_blocchi, wt);
   t2 = omp_get_wtime();
   double t_gauss = t2 - t1;
 
   /* In m ritorno un fattore non banale di N */
   unsigned int n_fact_non_banali = factorization(N, factor_base, 
-						 M, exponents, 
+						 M, exponents_mpz, 
 						 As, wt, n_fatt, 
 						 n_primes, m);
-
+  
   printf("#time_base time_sieve time_gauss time_totale\n");
   printf("%.6f ", t_base);
   printf("%.6f ", t_sieve);
   printf("%.6f ", t_gauss);
-  //double t_camp = 0;
   printf("%.6f\n", t_base + t_gauss + t_sieve);
-
+  
   if(n_fact_non_banali > 0) {
     /* Pulizia della memoria */
-    //finalize_vector(& primes);
-    //free(solutions);
-    //finalize_matrix(& exponents, poly_val_num);
-    finalize_vector_mpz(& As, poly_val_num);
-    //finalize_matrix_l(& M, n_fatt);
-    free(wt);
-    mpz_clear(s);
-
     return OK;
   }
   else {
     /* Pulizia della memoria */
-    //finalize_vector(& primes);
-    //free(solutions);
-    //finalize_matrix(& exponents, poly_val_num);
-    //finalize_vector_mpz(& As, poly_val_num);
-    //finalize_matrix_l(& M, n_fatt);
-    //free(wt);
-    //pz_clear(s);
-    
     return SOLO_FATTORIZZAZIONI_BANALI;
   }
 }

@@ -56,7 +56,7 @@ void add_vector_z2(word ** M, unsigned long k,
 
 /* Funzione che esegue la somma in Z dei vettori
  * v(k) = v(j) + v(k) */
-void add_vector_z(unsigned int ** M, unsigned long k,
+void add_vector_z(mpz_t ** M, unsigned long k,
 		  unsigned long j, unsigned long n_col);
 
 /* Funzione che setta la struttura row_stats con le informazioni
@@ -65,7 +65,7 @@ void get_wt_k(word ** M, unsigned long k, unsigned long n_col,
 	      struct row_stats * wt);
 
 /* Funzione che esegue l'eliminazione gaussiana */
-void gaussian_elimination(unsigned int ** M_z, // matrice esponenti in Z
+void gaussian_elimination(mpz_t ** M_z, // matrice esponenti in Z
 			  word ** M_z2, // matrice esponenti in Z2
 			  mpz_t * A, // vettore dei (A + s) calcolati
 			  mpz_t N, // numero da fattorizzare
@@ -82,7 +82,7 @@ void gaussian_elimination(unsigned int ** M_z, // matrice esponenti in Z
 unsigned factorization(mpz_t N, // numero da fattorizzare
 		       unsigned int * factor_base,
 		       word ** M_z2, // esponenti mod 2
-		       unsigned int ** M_z, // esponenti interi
+		       mpz_t ** M_z, // esponenti interi
 		       mpz_t * As, // (Ai + s) moltiplicati tra loro
 		       struct row_stats * wt, // zeri sulle righe
 		       unsigned long n_row, // #fattorizzaz. complete

@@ -10,33 +10,6 @@
  */
 
 #include "../include/eratostene.h"
-/*
-unsigned long eratosthenes_sieve(unsigned int * sieve, 
-				 long unsigned n) {
-	int n_threads = omp_get_num_threads();
-	long unsigned n_primi = 1;
-
-	long unsigned chunk = (n/2)/n_threads;
-
-	long unsigned i;
-	#pragma omp parallel for schedule(dynamic, chunk)
-	for(i = 0; i <= n/2; ++i)
-		sieve[i] = 1;
-
-	for(i = 3; i <= n; i += 2) {
-		
-		if(i*i > n)
-			i = n;  // -> break;
-		if(sieve[i/2] == 1) {
-			long unsigned j;
-			#pragma omp parallel for schedule(dynamic, chunk)
-			for(j = i; j <= n/i; j++)
-				sieve[(i*j)/2] = 0;
-
-		}
-	}
-}
-*/
 
 void eratosthenes_sieve(unsigned int * sieve, 
 				 long unsigned n) {
