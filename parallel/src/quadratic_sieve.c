@@ -30,6 +30,8 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
     
     ++fact_count;
   }
+
+  printf("Ho ricevuto %d fattorizzazioni\n", fact_count);
 }
 
 unsigned long quadratic_sieve(mpz_t N, 
