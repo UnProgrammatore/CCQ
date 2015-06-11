@@ -7,13 +7,21 @@ unsigned int smart_sieve(
 	unsigned int* factor_base,
 	unsigned int base_dim,
 	pair* solutions,
-	unsigned int** exponents,
-	mpz_t* As,
 	unsigned int poly_val_num,
 	unsigned int max_fact,
 	unsigned int intervals,
 	unsigned int startfrom
 	) {
+
+	unsigned int** exponents;
+	mpz_t* As;
+
+	int how_many_bytes;
+
+	unsigned int* buffer;
+	init_vector(buffer, base_dim);
+	unsigned char* buffer_as;
+	buffer_as = malloc(sizeof(unsigned char) * BUFFER_DIM);
 
 	unsigned int i; // Indice generico
 
@@ -70,15 +78,6 @@ unsigned int smart_sieve(
 					set_matrix(expo2, j - l, i, get_matrix(expo2, j - l, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j - l], evaluated_poly[j - l], factor_base[i]);
 				}
-				if(mpz_cmp_ui(evaluated_poly[j - l], 1) == 0) {
-					for(h = 0; h < base_dim; ++h) {
-						set_matrix(exponents, fact_count, h, get_matrix(expo2, j - l, h));
-					}
-					mpz_set(As[fact_count], As2[j - l]);
-					++fact_count;
-					if(fact_count >= max_fact)
-						go_on = 0;
-				}
 			}
 			solutions[i].sol1 = j; // Al prossimo giro ricominciamo da dove abbiamo finito
 
@@ -96,17 +95,20 @@ unsigned int smart_sieve(
 					set_matrix(expo2, j - l, i, get_matrix(expo2, j - l, i) + 1); // ++exponents[j][i];
 					mpz_divexact_ui(evaluated_poly[j - l], evaluated_poly[j - l], factor_base[i]);
 				}
-				if(mpz_cmp_ui(evaluated_poly[j - l], 1) == 0) {
-					for(h = 0; h < base_dim; ++h) {
-						set_matrix(exponents, fact_count, h, get_matrix(expo2, j - l, h));
-					}
-					mpz_set(As[fact_count], As2[j - l]);
-					++fact_count;
-					if(fact_count >= max_fact)
-						go_on = 0;
-				}
 			}
 			solutions[i].sol2 = j; // Al prossimo giro ricominciamo da dove abbiamo finito
+		}
+		for(i = 0; i < intervals; ++i) {
+			if(mpz_cmp_ui(evaluated_poly[i], 1) == 0) {
+				++fact_count;
+				for(j = 0; j < base_dim; ++j)
+					buffer[j] = get_matrix(expo2, i, j);
+				MPI_Send(buffer, base_dim, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
+				how_many_bytes = (mpz_sizeinbase(As2[i], 2) + 7) / 8;
+				*buffer_as = 0;
+				mpz_export(buffer_as, NULL, 1, 1, 1, 0, intermed);
+				MPI_Send(buffer_as, how_many_bytes, MPI_UNSIGNED_CHAR, 0, AS_TAG, MPI_COMM_WORLD);
+			}
 		}
 	}
 	return fact_count;
