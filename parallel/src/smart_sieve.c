@@ -13,9 +13,6 @@ unsigned int smart_sieve(
 	unsigned int startfrom
 	) {
 
-	unsigned int** exponents;
-	mpz_t* As;
-
 	int how_many_bytes;
 
 	unsigned int* buffer;
@@ -111,5 +108,6 @@ unsigned int smart_sieve(
 			}
 		}
 	}
+	MPI_Send(buffer, 0, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
 	return fact_count;
 }
