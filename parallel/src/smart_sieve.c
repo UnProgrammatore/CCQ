@@ -19,7 +19,7 @@ unsigned int smart_sieve(
 	int how_many_bytes;
 
 	unsigned int* buffer;
-	init_vector(buffer, base_dim);
+	init_vector(&buffer, base_dim);
 	unsigned char* buffer_as;
 	buffer_as = malloc(sizeof(unsigned char) * BUFFER_DIM);
 
