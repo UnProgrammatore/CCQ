@@ -36,7 +36,8 @@ unsigned int master(unsigned int base_dim,
 		      unsigned int max_fact, 
 		      unsigned int** exponents, 
 		      mpz_t * As,
-		      int comm_size);
+		      int comm_size,
+		      unsigned int * n_fatt);
 
 unsigned long quadratic_sieve(mpz_t N, // Numero da fattorizzare
 				unsigned int n, // Parametro per il crivello di eratostene

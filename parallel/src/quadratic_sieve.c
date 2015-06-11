@@ -5,7 +5,7 @@
 /* Ritorna un codice di errore oppure 0 */
 unsigned int master(unsigned int base_dim, unsigned int max_fact, 
 		    unsigned int** exponents, mpz_t * As,
-		    int comm_size) {
+		    int comm_size, unsigned int * n_fatt) {
   unsigned int fact_count = 0;
   unsigned int* buffer_exp;
   MPI_Status status1;
@@ -26,8 +26,10 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
     MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
     if(count == 0) {
       ++n_finished;
-      if(n_finished >=  comm_size - 1)
+      if(n_finished >=  comm_size - 1) {
+	*n_fatt = fact_count;
 	return EVERYONE_FINISHED;
+      }
     }
     
     source = status1.MPI_SOURCE;
@@ -43,6 +45,8 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
     
     ++fact_count;
   }
+  *n_fatt = fact_count;
+  return 0;
 }
 
 unsigned long quadratic_sieve(mpz_t N, 
@@ -111,7 +115,7 @@ unsigned long quadratic_sieve(mpz_t N,
     init_vector_mpz(& As, n_primes + max_fact);
 
     /* Procedura master che riceve le fatt. complete */
-    master(n_primes, max_fact, exponents, As, comm_size);
+    master(n_primes, max_fact, exponents, As, comm_size, & n_fatt);
   } else {
     n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
 			 poly_val_num, max_fact, 
