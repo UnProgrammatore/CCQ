@@ -1,8 +1,11 @@
 #include "../include/quadratic_sieve.h"
 
+
+
 /* Ritorna un codice di errore oppure 0 */
 unsigned int master(unsigned int base_dim, unsigned int max_fact, 
-		    unsigned int** exponents, mpz_t * As) {
+		    unsigned int** exponents, mpz_t * As,
+		    int comm_size) {
   unsigned int fact_count = 0;
   unsigned int* buffer_exp;
   MPI_Status status1;
@@ -11,11 +14,21 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
   int source;
   unsigned char buffer_As[BUFFER_DIM];
 
+  /* Contatore degli slave che hanno terminato */
+  unsigned int n_finished = 0;
+
   init_vector(& buffer_exp, base_dim);
   while(fact_count < max_fact + base_dim) {
     MPI_Recv(buffer_exp, base_dim, MPI_UNSIGNED, 
 	     MPI_ANY_SOURCE, ROW_TAG, 
 	     MPI_COMM_WORLD, &status1);
+    
+    MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
+    if(count == 0) {
+      ++n_finished;
+      if(n_finished >=  comm_size - 1)
+	return EVERYONE_FINISHED;
+    }
     
     source = status1.MPI_SOURCE;
     
@@ -41,7 +54,9 @@ unsigned long quadratic_sieve(mpz_t N,
   double t1, t2;
   
   int rank;
+  int comm_size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, & comm_size);
 
   /* Controllo con test di pseudoprimalità di rabin */
   if(mpz_probab_prime_p(N, 25)) {
@@ -96,7 +111,7 @@ unsigned long quadratic_sieve(mpz_t N,
     init_vector_mpz(& As, n_primes + max_fact);
 
     /* Procedura master che riceve le fatt. complete */
-    master(n_primes, max_fact, exponents, As);
+    master(n_primes, max_fact, exponents, As, comm_size);
   } else {
     n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
 			 poly_val_num, max_fact, 

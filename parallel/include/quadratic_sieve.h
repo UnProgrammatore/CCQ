@@ -21,6 +21,9 @@
 #define AS_TAG 1
 #define ROW_TAG 2
 
+/* */
+#define EVERYONE_FINISHED 1
+
 /* Stati ritornati dall'algoritmo */
 enum qs_error_codes{
   OK, // L'algortimo ha trovato una fattorizzazione non banale
@@ -30,15 +33,16 @@ enum qs_error_codes{
 };
 
 unsigned int master(unsigned int base_dim, 
-		    unsigned int max_fact, 
-		    unsigned int** exponents, 
-		    mpz_t * As);
+		      unsigned int max_fact, 
+		      unsigned int** exponents, 
+		      mpz_t * As,
+		      int comm_size);
 
 unsigned long quadratic_sieve(mpz_t N, // Numero da fattorizzare
-			      unsigned int n, // Parametro per il crivello di eratostene
-			      unsigned int poly_val_num, // A in [0, poly_val_num]
-			      unsigned int max_fact, // Numero di fatt. complete da trovare
-			      unsigned int interval, // Numero di intervalli in cui spezzare sieve
-			      mpz_t m); // Fattore primo eventualmente trovato
+				unsigned int n, // Parametro per il crivello di eratostene
+				unsigned int poly_val_num, // A in [0, poly_val_num]
+				unsigned int max_fact, // Numero di fatt. complete da trovare
+				unsigned int interval, // Numero di intervalli in cui spezzare sieve
+				mpz_t m); // Fattore primo eventualmente trovato
 
 #endif // QUADRATIC_SIEVE_H
