@@ -10,12 +10,14 @@
 
 #include <omp.h>
 #include <gmp.h>
+#include <mpi.h>
 
 /* Stati ritornati dall'algoritmo */
 enum qs_error_codes{
   OK, // L'algortimo ha trovato una fattorizzazione non banale
   SOLO_FATTORIZZAZIONI_BANALI, // Nessuna fattorizzazione non banale trovata
-  NUM_PRIMO // N su cui si lancia l'algortimo è primo
+  NUM_PRIMO, // N su cui si lancia l'algortimo è primo
+  IM_A_SLAVE // Ritornato dagli slave
 };
 
 unsigned long quadratic_sieve(mpz_t N, // Numero da fattorizzare

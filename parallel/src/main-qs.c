@@ -22,7 +22,10 @@ int main(int argc, char ** argv) {
   double t1, t2;
   int retvalue;
 
+  int rank;
+
   MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   mpz_t N;
   mpz_init(N);
@@ -37,7 +40,7 @@ int main(int argc, char ** argv) {
   mpz_set_str(P2, argv[2], 10); 
   mpz_mul(N, P1, P2);
 
-  gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
+  //gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
 
   unsigned int n = atoi(argv[3]);
   unsigned int poly_val_num = atoi(argv[4]);;
@@ -72,5 +75,6 @@ int main(int argc, char ** argv) {
     
     retvalue = 1;
   }
+  MPI_Finalize();
   return retvalue;
 }

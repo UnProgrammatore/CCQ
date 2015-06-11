@@ -2,6 +2,14 @@
 
 #include <stdio.h>
 
+void master() {
+
+}
+
+void slave(int rank, int dimension) {
+
+}
+
 unsigned long quadratic_sieve(mpz_t N, 
 			      unsigned int n, 
 			      unsigned int poly_val_num,
@@ -10,6 +18,9 @@ unsigned long quadratic_sieve(mpz_t N,
 			      mpz_t m) {
   double t1, t2;
   
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
   /* Controllo con test di pseudoprimalità di rabin */
   if(mpz_probab_prime_p(N, 25)) {
     return NUM_PRIMO;
@@ -32,13 +43,12 @@ unsigned long quadratic_sieve(mpz_t N,
     }
 
   unsigned int n_all_primes = j;
-
+    
   unsigned int simple_factor = trivial_fact(N, primes, n_all_primes);
   if(simple_factor != 0) {
     mpz_set_ui(m, simple_factor);
-    return OK;
+    return rank == 0 ? OK : IM_A_SLAVE;
   }
-
   /* Calcolo base di fattori e soluzioni dell'eq x^2 = N mod p */
   pair * solutions = malloc(sizeof(pair) * n_all_primes);
   unsigned int * factor_base = primes;
@@ -64,7 +74,7 @@ unsigned long quadratic_sieve(mpz_t N,
   unsigned int n_fatt;
  
   n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num, max_fact, interval);
+		 exponents, As, poly_val_num, max_fact, interval, 0);
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
 

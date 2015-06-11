@@ -11,7 +11,8 @@ unsigned int smart_sieve(
 	mpz_t* As,
 	unsigned int poly_val_num,
 	unsigned int max_fact,
-	unsigned int intervals
+	unsigned int intervals,
+	unsigned int startfrom
 	) {
 
 	unsigned int i; // Indice generico
@@ -41,7 +42,7 @@ unsigned int smart_sieve(
 
 	max_fact += base_dim; // k + n
 
-	for(l = 0; l <= poly_val_num - intervals && go_on; l += intervals) {
+	for(l = startfrom; l <= poly_val_num - intervals && go_on; l += intervals) {
 		for(i = 0; i < ((intervals / N_BITS) + 1); ++i) {
 			set_matrix_l(is_used_expo2, 0, i, 0);
 		}

@@ -16,7 +16,8 @@ unsigned int smart_sieve(
 	mpz_t* As, // Vettore in cui verranno salvati i valori di (A + s)
 	unsigned int poly_val_num, // Il numero di valori di A che si vogliono provare nel polinomio
 	unsigned int max_fact, // max_fact + base_dim = massime fattorizzazioni
-	unsigned int intervals
+	unsigned int intervals,
+	unsigned int startfrom
 	);
 
 #endif // SIEVE_GUARD
