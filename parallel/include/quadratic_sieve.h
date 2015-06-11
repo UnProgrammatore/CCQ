@@ -11,6 +11,15 @@
 #include <omp.h>
 #include <gmp.h>
 #include <mpi.h>
+#include <stdio.h>
+
+/* Dimensine buffer di ricezione per gli mpz_t A + s */
+#define BUFFER_DIM 64
+
+/* Tag per le MPI_Recv per distinguere le righe di esponenti
+   dagli A + s spediti */
+#define AS_TAG 1
+#define ROW_TAG 2
 
 /* Stati ritornati dall'algoritmo */
 enum qs_error_codes{
@@ -19,6 +28,11 @@ enum qs_error_codes{
   NUM_PRIMO, // N su cui si lancia l'algortimo è primo
   IM_A_SLAVE // Ritornato dagli slave
 };
+
+unsigned int master(unsigned int base_dim, 
+		    unsigned int max_fact, 
+		    unsigned int** exponents, 
+		    mpz_t * As);
 
 unsigned long quadratic_sieve(mpz_t N, // Numero da fattorizzare
 			      unsigned int n, // Parametro per il crivello di eratostene

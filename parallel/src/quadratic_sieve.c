@@ -1,13 +1,35 @@
 #include "../include/quadratic_sieve.h"
 
-#include <stdio.h>
+/* Ritorna un codice di errore oppure 0 */
+unsigned int master(unsigned int base_dim, unsigned int max_fact, 
+		    unsigned int** exponents, mpz_t * As) {
+  unsigned int fact_count = 0;
+  unsigned int* buffer_exp;
+  MPI_Status status1;
+  MPI_Status status2;
+  int count;
+  int source;
+  unsigned char buffer_As[BUFFER_DIM];
 
-void master() {
+  init_vector(& buffer_exp, base_dim);
+  while(fact_count < max_fact + base_dim) {
+    MPI_Recv(buffer_exp, base_dim, MPI_UNSIGNED, 
+	     MPI_ANY_SOURCE, ROW_TAG, 
+	     MPI_COMM_WORLD, &status1);
+    
+    source = status1.MPI_SOURCE;
+    
+    for(unsigned int i = 0; i < base_dim; ++i)
+      set_matrix(exponents, fact_count, i, buffer_exp[i]);
+    
+    MPI_Recv(buffer_As, BUFFER_DIM, MPI_UNSIGNED_CHAR, source, 
+	     AS_TAG, MPI_COMM_WORLD, &status2);
 
-}
-
-void slave(int rank, int dimension) {
-
+    MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
+    mpz_import(As[fact_count], count, 1, 1, 1, 0, buffer_As);
+    
+    ++fact_count;
+  }
 }
 
 unsigned long quadratic_sieve(mpz_t N, 
@@ -44,6 +66,8 @@ unsigned long quadratic_sieve(mpz_t N,
 
   unsigned int n_all_primes = j;
     
+  /* Fattorizzazione eseguita da tutti, gli slave ritornano
+     IM_A_SLAVE mentre il main il fattore */
   unsigned int simple_factor = trivial_fact(N, primes, n_all_primes);
   if(simple_factor != 0) {
     mpz_set_ui(m, simple_factor);
@@ -59,25 +83,26 @@ unsigned long quadratic_sieve(mpz_t N,
   double t_base = t2 - t1; 
   printf("#dimensione base di fattori: %d\n", n_primes);
 
-  /* Vettore degli esponenti in Z */
-  unsigned int ** exponents;
-  init_matrix(& exponents, n_primes + max_fact, n_primes);
-  t2 = omp_get_wtime();
-  double t_camp = t2 - t1;
-  /* Vettore degli (Ai + s) */
- 
-  t1 = omp_get_wtime();
-  mpz_t * As;
-  init_vector_mpz(& As, n_primes + max_fact);
-
   /* Parte di crivello: troviamo le k+n fattorizzazioni complete */
   unsigned int n_fatt;
- 
-  n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
-		 exponents, As, poly_val_num, max_fact, interval, 0);
+  if(rank == 0){
+    /* Vettore degli esponenti in Z */
+    unsigned int ** exponents;
+    init_matrix(& exponents, n_primes + max_fact, n_primes);
+    /* Vettore degli (Ai + s) */
+    mpz_t * As;
+    init_vector_mpz(& As, n_primes + max_fact);
+    master(n_primes, max_fact, exponents, As);
+  } else {
+    n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
+			 poly_val_num, max_fact, 
+			 interval, 0);
+    // per gli slave l'algoritmo termina qui
+    return IM_A_SLAVE;
+  }
   t2 = omp_get_wtime();
-  double t_sieve = t2 - t1;
 
+  double t_sieve = t2 - t1;
   printf("#numero fattorizzazioni complete trovate: %d\n", n_fatt);
 
   t1 = omp_get_wtime();
