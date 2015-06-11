@@ -29,7 +29,7 @@ $(LIB_DIR)/base_fattori.o: $(SRC_DIR)/base_fattori.c
 	$(CC) $^ $(CC_ARGS) -c -o $@
 
 $(LIB_DIR)/linear_algebra.o: $(SRC_DIR)/linear_algebra.c
-	$(CC) $^ $(CC_ARGS) -c -o $@
+	$(CC) $^ $(CC_ARGS) -c -fopenmp -o $@
 
 $(LIB_DIR)/matrix.o: $(SRC_DIR)/matrix.c
 	$(CC) $^ $(CC_ARGS) -c -o $@

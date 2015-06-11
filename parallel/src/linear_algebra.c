@@ -45,7 +45,7 @@ void add_vector_z(mpz_t ** M, unsigned long k,
 
   mpz_t y;
   mpz_init(y);
-  
+
   for(unsigned long i = 0; i < n_col; ++i) {
     get_matrix_mpz(x, M, k, i);
     get_matrix_mpz(y, M, j, i);
@@ -94,14 +94,19 @@ void gaussian_elimination(mpz_t ** M_z,
   double t_Z = 0;
   double t_As = 0;
   double t_get_wt = 0;
+
+  int threads = omp_get_num_threads();
+  int chunck = n_row / 4;
+  printf("%d\n", threads);
   
   for(unsigned long i = 0; i < n_col; ++i) {
     unsigned long j;
     for(j = 0; j < n_row && wt[j].b_dx != i; ++j)
       ; // avanzo j e basta
 
+#pragma omp parallel for schedule(dynamic, n_row/4) num_threads(4)
     for(unsigned k = j + 1; k < n_row; ++k) {
-      
+      //printf("sono il threads num: %d\n", omp_get_thread_num());
       if(get_k_i(M_z2, k, i)) { // il bit v(k)(i) deve essere a 1
 	add_vector_z2(M_z2, k, j, n_blocks); // v(k) = v(k) + v(j) mod 2
      	add_vector_z(M_z, k, j, n_col); // v(k) = v(k) + v(j)
@@ -149,6 +154,7 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
       ++n_dip;
 
       mpz_set_ui(Y, 1);
+      
       for(int j = 0; j < n_primes; ++j) {
 	mpz_set_ui(mpz_prime, factor_base[j]);
 	get_matrix_mpz(exp, M_z, i, j);

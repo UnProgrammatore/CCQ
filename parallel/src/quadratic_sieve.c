@@ -83,15 +83,19 @@ unsigned long quadratic_sieve(mpz_t N,
   double t_base = t2 - t1; 
   printf("#dimensione base di fattori: %d\n", n_primes);
 
+  /* Vettore degli esponenti in Z */
+  unsigned int ** exponents;
+  /* Vettore degli (Ai + s) */
+  mpz_t * As;
   /* Parte di crivello: troviamo le k+n fattorizzazioni complete */
   unsigned int n_fatt;
+
   if(rank == 0){
-    /* Vettore degli esponenti in Z */
-    unsigned int ** exponents;
+    /* Inizializzazioni vettori */
     init_matrix(& exponents, n_primes + max_fact, n_primes);
-    /* Vettore degli (Ai + s) */
-    mpz_t * As;
     init_vector_mpz(& As, n_primes + max_fact);
+
+    /* Procedura master che riceve le fatt. complete */
     master(n_primes, max_fact, exponents, As);
   } else {
     n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
