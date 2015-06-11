@@ -2,6 +2,7 @@
 #include <gmp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpi.h>
 
 #include "../include/quadratic_sieve.h"
 
@@ -17,7 +18,11 @@
 
 
 int main(int argc, char ** argv) {
-  double t1, t2;  
+
+  double t1, t2;
+  int retvalue;
+
+  MPI_Init(&argc, &argv);
 
   mpz_t N;
   mpz_init(N);
@@ -57,7 +62,7 @@ int main(int argc, char ** argv) {
     printf("#N time\n");
     gmp_printf("%Zd %.6f\n", N, time);
 
-    exit(0);
+    retvalue= 0;
   }
   if(status == SOLO_FATTORIZZAZIONI_BANALI) {
     printf("#Nessuna fattorizzazione non banale trovata\n\n"); 
@@ -65,7 +70,7 @@ int main(int argc, char ** argv) {
     //printf("#N time\n");
     //gmp_printf("%Zd %.6f\n", N, time);
     
-    exit(1);
+    retvalue = 1;
   }
-
+  return retvalue;
 }
