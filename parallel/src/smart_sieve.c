@@ -63,6 +63,14 @@ unsigned int smart_sieve(
 		}
 
 		for(i = 0; i < base_dim && go_on; ++i) {
+			
+			// Mi assicuro che tutti partano dal numero giusto
+			while(solutions[i].sol1 < startfrom)
+				solutions[i].sol1 += factor_base[i];
+
+			while(solutions[i].sol2 < startfrom)
+				solutions[i].sol2 += factor_base[i];
+
 			for(j = solutions[i].sol1; j < intervals + l && go_on; j += factor_base[i]) {
 
 				while(mpz_divisible_ui_p(evaluated_poly[j - l], factor_base[i])) {
@@ -100,16 +108,21 @@ unsigned int smart_sieve(
 		for(i = 0; i < intervals; ++i) {
 			if(mpz_cmp_ui(evaluated_poly[i], 1) == 0) {
 				++fact_count;
+				//printf("sl) ");
 				for(j = 0; j < base_dim; ++j)
 					buffer[j] = get_matrix(expo2, i, j);
+				//	printf("%d", buffer[j]);
+				//}
+				//gmp_printf(" - %Zd", As2[i]);
+				//printf("\n");
 				MPI_Send(buffer, base_dim, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
 				how_many_bytes = (mpz_sizeinbase(As2[i], 2) + 7) / 8;
 				*buffer_as = 0;
-				mpz_export(buffer_as, NULL, 1, 1, 1, 0, intermed);
+				mpz_export(buffer_as, NULL, 1, 1, 1, 0, As2[i]);
 				MPI_Send(buffer_as, how_many_bytes, MPI_UNSIGNED_CHAR, 0, AS_TAG, MPI_COMM_WORLD);
 			}
 		}
 	}
-	MPI_Send(buffer, 0, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
+	//MPI_Send(buffer, 0, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
 	return fact_count;
 }
