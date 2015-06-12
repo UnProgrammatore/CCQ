@@ -97,7 +97,7 @@ void gaussian_elimination(mpz_t ** M_z,
 
   int threads = omp_get_num_threads();
   int chunck = n_row / 4;
-  printf("%d\n", threads);
+  //printf("%d\n", threads);
   
   for(unsigned long i = 0; i < n_col; ++i) {
     unsigned long j;

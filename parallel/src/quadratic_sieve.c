@@ -23,6 +23,21 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
 	     MPI_COMM_WORLD, &status1);
     
     MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
+    /*printf("Ho ricevuto ");
+      for(unsigned int k = 0; k < base_dim; ++k) {
+        printf("%d ", buffer_exp[k]);
+      }
+    printf("\n");*/
+   // MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
+    /*
+    if(count == 0) {
+      ++n_finished;
+      if(n_finished >=  comm_size - 1) {
+	*n_fatt = fact_count;
+	return EVERYONE_FINISHED;
+      }
+    }
+    */
     
     /*
       if(count == 0) {
@@ -35,16 +50,20 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
       //     }
       }*/
     source = status1.MPI_SOURCE;
-    
-    for(unsigned int i = 0; i < base_dim; ++i)
+    printf("Mm) ");
+    for(unsigned int i = 0; i < base_dim; ++i) {
       set_matrix(exponents, fact_count, i, buffer_exp[i]);
-    
+      printf("%u", buffer_exp[i]);
+    }
+        
     MPI_Recv(buffer_As, BUFFER_DIM, MPI_UNSIGNED_CHAR, source, 
 	     AS_TAG, MPI_COMM_WORLD, &status2);
 
     MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
     mpz_import(As[fact_count], count, 1, 1, 1, 0, buffer_As);
     
+    gmp_printf("- %Zd\n", fact_count, As[fact_count]);
+    printf("\n");
     ++fact_count;
   }
   *n_fatt = fact_count;
@@ -135,7 +154,6 @@ unsigned long quadratic_sieve(mpz_t N,
   t2 = omp_get_wtime();
   double t_sieve = t2 - t1;
   printf("#numero fattorizzazioni complete trovate: %d\n", n_fatt);
-
   
   for(unsigned int i = 0; i < n_fatt; ++i) {
     for(unsigned int k = 0; k < n_primes; ++k)
@@ -143,8 +161,7 @@ unsigned long quadratic_sieve(mpz_t N,
     gmp_printf(" - %Zd\n", As[i]);
   }
   printf("\n");
-  
-
+ 
   t1 = omp_get_wtime();
   /* Matrice di esponenti in Z_2 organizzata a blocchi di bit */ 
   word ** M;

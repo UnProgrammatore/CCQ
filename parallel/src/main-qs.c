@@ -20,7 +20,7 @@
 int main(int argc, char ** argv) {
 
   double t1, t2;
-  int retvalue;
+  int retvalue = 0;
 
   int rank;
 
@@ -54,6 +54,7 @@ int main(int argc, char ** argv) {
 
   t1 = omp_get_wtime();
   int status = quadratic_sieve(N, n, poly_val_num, max_fact, interval, N1);
+  printf("ho finito %d stat = %d\n", rank, status);
   t2 = omp_get_wtime();
   double time = t2 - t1;
 
@@ -65,9 +66,9 @@ int main(int argc, char ** argv) {
     printf("#N time\n");
     gmp_printf("%Zd %.6f\n", N, time);
 
-    retvalue= 0;
+    retvalue = 0;
   }
-  if(status == SOLO_FATTORIZZAZIONI_BANALI) {
+  else if(status == SOLO_FATTORIZZAZIONI_BANALI) {
     printf("#Nessuna fattorizzazione non banale trovata\n\n"); 
 
     //printf("#N time\n");
@@ -75,6 +76,11 @@ int main(int argc, char ** argv) {
     
     retvalue = 1;
   }
+  else if(status == IM_A_SLAVE) {
+    printf("#Slave %d chiude\n", rank); 
+    retvalue = 0;
+  }
+
   MPI_Finalize();
-  return retvalue;
+  exit(0);
 }
