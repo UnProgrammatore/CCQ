@@ -23,7 +23,6 @@ int main(int argc, char ** argv) {
   int retvalue;
 
   int rank;
-
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -35,7 +34,7 @@ int main(int argc, char ** argv) {
 
   mpz_t P2;
   mpz_init(P2);
-  
+
   mpz_set_str(P1, argv[1], 10); 
   mpz_set_str(P2, argv[2], 10); 
   mpz_mul(N, P1, P2);
@@ -46,6 +45,7 @@ int main(int argc, char ** argv) {
   unsigned int poly_val_num = atoi(argv[4]);;
   unsigned int max_fact = atoi(argv[5]);
   unsigned int interval = atoi(argv[6]);
+
  
   mpz_t N1;
   mpz_t N2;
