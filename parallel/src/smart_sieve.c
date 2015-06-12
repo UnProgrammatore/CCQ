@@ -106,13 +106,13 @@ unsigned int smart_sieve(
 		for(i = 0; i < intervals; ++i) {
 			if(mpz_cmp_ui(evaluated_poly[i], 1) == 0) {
 				++fact_count;
-				printf("sl) ");
-				for(j = 0; j < base_dim; ++j) {
+				//printf("sl) ");
+				for(j = 0; j < base_dim; ++j)
 					buffer[j] = get_matrix(expo2, i, j);
-					printf("%d", buffer[j]);
-				}
-				gmp_printf(" - %Zd", As2[i]);
-				printf("\n");
+				//	printf("%d", buffer[j]);
+				//}
+				//gmp_printf(" - %Zd", As2[i]);
+				//printf("\n");
 				MPI_Send(buffer, base_dim, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
 				how_many_bytes = (mpz_sizeinbase(As2[i], 2) + 7) / 8;
 				*buffer_as = 0;
@@ -121,6 +121,6 @@ unsigned int smart_sieve(
 			}
 		}
 	}
-	MPI_Send(buffer, 0, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
+	//MPI_Send(buffer, 0, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
 	return fact_count;
 }
