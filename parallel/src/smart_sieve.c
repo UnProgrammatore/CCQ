@@ -13,6 +13,8 @@ unsigned int smart_sieve(
 	unsigned int startfrom
 	) {
 
+
+        printf("Quadratic sieve ");
 	int how_many_bytes;
 
 	unsigned int* buffer;
