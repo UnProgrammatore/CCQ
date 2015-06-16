@@ -35,7 +35,7 @@ $(LIB_DIR)/matrix.o: $(SRC_DIR)/matrix.c
 	$(CC) $^ $(CC_ARGS) -c -o $@
 
 $(LIB_DIR)/smart_sieve.o: $(SRC_DIR)/smart_sieve.c
-	$(CC) $^ $(CC_ARGS) -c -o $@
+	$(CC) $^ $(CC_ARGS) -fopenmp -c -o $@
 
 $(LIB_DIR)/vector.o: $(SRC_DIR)/vector.c
 	$(CC) $^ $(CC_ARGS) -c -o $@

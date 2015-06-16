@@ -16,7 +16,6 @@
  * interval è la grandezza di intervalli in cui separare [0, poly_val_num]
  */
 
-
 int main(int argc, char ** argv) {
 
   double t1, t2;
@@ -54,7 +53,7 @@ int main(int argc, char ** argv) {
 
   t1 = omp_get_wtime();
   int status = quadratic_sieve(N, n, poly_val_num, max_fact, interval, N1);
-  printf("ho finito %d stat = %d\n", rank, status);
+  //printf("ho finito %d stat = %d\n", rank, status);
   t2 = omp_get_wtime();
   double time = t2 - t1;
 
@@ -77,10 +76,12 @@ int main(int argc, char ** argv) {
     retvalue = 1;
   }
   else if(status == IM_A_SLAVE) {
-    printf("#Slave %d chiude\n", rank); 
+    //printf("#Slave %d chiude\n", rank); 
     retvalue = 0;
   }
 
+  if(rank == 0)
+  	MPI_Abort(MPI_COMM_WORLD, 0);
   MPI_Finalize();
   exit(0);
 }
