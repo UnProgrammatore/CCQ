@@ -3,8 +3,14 @@
 \label{sec:parallelo}
 %************************************************
 
-\lipsum[1]
-
+L'algoritmo ha una particolarit\'{a} molto utile sotto l'aspetto della complessita temporale:
+la sezione del codice deputata alla valutazione del polinomio $Q(A)$ è fortemente parallelizzabile.
+Per ottenere le congruenze necessarie dobbiamo scomporre un numero notevole di polinomi valutati 
+sulla base di fattori FB.
+Questa parte del lavoro pu\'{o} essere fortemente parallelizzata in quanto aumentando 
+il lavoro demandato ai singoli processori è essenzialmente quello di valutare e scomporre i polinomi
+su intervalli diversi; questo permette di demandare un notevole calcolo ai nodi paralleli e quindi uno speed-up notevole all'aumentare del numero di nodi.
+per quanto la parte appena successiva, quella di eliminazione gaussiana è intrinsecamente seriale.
 
 
 

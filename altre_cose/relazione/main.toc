@@ -1,0 +1,25 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\select@language {italian}
+\defcounter {refsection}{0}\relax 
+\select@language {italian}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1}Introduzione e obiettivi}{1}{section.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2}Crivello Quadratico}{2}{section.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3}Architettura del sistema di calcolo distribuito}{4}{section.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.1}MPI}{4}{subsection.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4}Tecnologie utilizzate}{4}{section.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1}OpenMPI}{4}{subsection.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5}Strategia di parallelizzazione dell'algoritmo}{5}{section.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {6}Algoritmo parallelizzato}{5}{section.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {7}Risultati}{5}{section.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {8}Sviluppi futuri}{6}{section.8}

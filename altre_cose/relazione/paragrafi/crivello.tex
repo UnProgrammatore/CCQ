@@ -3,6 +3,107 @@
 \label{sec:crivello}
 %************************************************
 
+\begin{flushleft}
+
+
+Il Crivello quadratico è assieme al Crivello coi Campi di Numeri l'algoritmo di fattorizzazione
+pi\'{u} veloce ad oggi conosciuto.
+Il costo computazionale risulta essere asintoticamente subesponenziale nell'ordine di
+$O(exp(sqrt(log(N))log(log(N))))$.
+Per comprendere l'algoritmo occorre presentare almeno in parte la tecnica di fattorizzazione di
+Fermat.
+Fermat osserv\'{o} che per trovare una fattorizzazione di un numero N si possono trovare due 
+numeri X e Y tali per cui $X^2-Y^2 = N$ trovando quindi $(X+Y)(X-Y)$.
+Qualora $X+Y$ o $X-Y$ non risultassero fattori banali, ossia 1 o N stesso, avremmo trovato una
+fattorizzazione completa per N.
+
+Il Crivello Quadratico parte da questa semplice idea sviluppandola per ottenere un algoritmo 
+alquanto efficiente e piuttosto articolato.
+
+\subsection*{algoritmo}
+Dato un numero N intero, il crivello, a differenza dell'algoritmo di Fermat, cerca dei valori 
+X e Y tali per cui valga la relazione $X \equiv Y \mod N$, successivamente ricerca il massimo comun
+divisore tra $(X-Y,N)$.
+Iniziamo calcolando una base di fattori primi FB di dimensione $k=k(N)$.
+Questo calcolo avviene mediante la scrematura di una base data dal crivello di eratostene.
+La discriminante per i fattori primi \emph{p} della base è che essi abbiano simbolo di Legendre 
+$(N|P)=1$, ossia siano tali per cui N sia un residuo quadratico modulo p
+Sia ora $s=\sqrt[2]{N}$ impostiamo il seguente polinomio: $Q(A)=(A+s)^2-N$.
+Siamo certi che $Q(A)\equiv N$ sia un quadrato perfetto, il lavoro ora consiste nel 
+trovare dei valori di A tali per qui $Q(A)$ si fattorizzi completamente sulla base di fattori
+precedentemente calcolata.
+Quando uno di questi polinomi si fattorizza completamente sulla base FB creiamo un vettore
+$v=(\alpha_1,\alpha_2, .. , \alpha_n)$ dove ogni $\alpha_i$ rappresenta l'esponente dell'i-esimo numero primo nella fattorizzazione di $Q(A)$.
+Calcoliamo quindi un altro vettore $v_2=(\alpha_1,\alpha_2, .. , \alpha_n)_2$ ossia il vettore 
+degli esponenti in base binaria.
+Nel caso banale in cui $v_i$ fosse identicamente nullo, allora ogni primo avrebbe un esponente
+pari, in questo caso sarebbe un quadrato perfetto e, quindi, avremmo trovato una congruenza del tipo $X^2 \equiv Y^2\mod N$.
+Anche se questo accadesse potremmo aver ottenuto una fattorizzazione banale, si prosegue quindi
+con la parte dell'algoritmo che riguarda prettamente l'algebra lineare.
+I vettori $v_2i$ vengono inseriti tutti in una grossa matrice.
+Dall'algebra sappiamo che, data una matrice di k colonne necessita di almeno k+1 righe per 
+ottenere almeno una dipendenza lineare.
+Nel nostro caso occorrerà quindi trovare almeno $k+m$ con $m\geq1$ per poter ottenere un numero di righe tale da permettere di trovare almeno una dipendenza lineare.
+
+Consideriamo le seguenti matrici:
+
+\begin{center}
+
+\begin{tabular}{ |l|c|c|c|c| }
+\hline
+$v_1$ & 3 & 4 & 2 & 7\\
+\hline
+$v_2$ & 3 & 2 & 2 & 2\\
+\hline
+$v_3$ & 5 & 2 & 3 & 1\\
+\hline
+$v_4$ & 6 & 1 & 3 & 3\\
+\hline
+$v_5$ & 2 & 2 & 2 & 3\\
+\hline
+\end{tabular}
+
+\vspace{1cm} 
+
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+$v_1^2$ & 1 & 0 & 0 & 1\\
+\hline
+$v_2^2$ & 1 & 0 & 0 & 0\\
+\hline
+$v_3^2$ & 1 & 0 & 1 & 1\\
+\hline
+$v_4^2$ & 0 & 1 & 1 & 1\\
+\hline
+$v_5^2$ & 0 & 0 & 0 & 1\\
+\hline
+\end{tabular}
+
+\end{center}
+
+Notiamo che dalla combinazione lineare di $v1_2$ $v2_2$ e $v4_2$ otteniamo un vettore nullo.
+Andiamo quindi a considerare ora i relativi vettori non modulati $ v1 v2 e v5$ e sommiamoli tra
+loro, ottenendo $v_125=(8,8,6,12)$.
+Se ora consideriamo la congruenza 
+\begin{center}
+   $Q(A_1)Q(A_2)Q(A_5) \equiv 2^8*3^8*5^6*7^12 \mod N$
+\end{center}
+Considerando il membro di sinistra come la X e quello di destra come la Y della nostra relazione iniziale, possiamo ricercare la congruenza desiderata e tentare di fattorizzare N.
+
+
+
+
+
+
+
+
+
+
+
+
+\end{flushleft}
+
+
 \lipsum[1]
 
 
