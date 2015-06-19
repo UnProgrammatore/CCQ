@@ -16,57 +16,65 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
   unsigned int n_finished = 0;
   int si = 0;
 
-  init_vector(& buffer_exp, base_dim);
+  init_vector(& buffer_exp, base_dim+1);
   while(fact_count < max_fact + base_dim) {
-    MPI_Recv(buffer_exp, base_dim, MPI_UNSIGNED, 
+    MPI_Recv(buffer_exp, base_dim+1, MPI_UNSIGNED, 
 	     MPI_ANY_SOURCE, ROW_TAG, 
 	     MPI_COMM_WORLD, &status1);
     
     //MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
-    /*printf("Ho ricevuto ");
-      for(unsigned int k = 0; k < base_dim; ++k) {
-        printf("%d ", buffer_exp[k]);
-      }
-    printf("\n");*/
-   // MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
-    /*
-    if(count == 0) {
-      ++n_finished;
-      if(n_finished >=  comm_size - 1) {
-	*n_fatt = fact_count;
-	return EVERYONE_FINISHED;
-      }
-    }
-    */
-    
-    /*
-      if(count == 0) {
-      //++n_finished;
-      //if(n_finished >=  comm_size - 1) {
-      //	*n_fatt = fact_count;
-      //	printf("f=%u c=%u fatt=%u\n", n_finished, comm_size-1, *n_fatt);
-     
-      //return EVERYONE_FINISHED;
-      //     }
-      }*/
+    //printf("Ho ricevuto %d\n", count);
     source = status1.MPI_SOURCE;
-    
-    //printf("Mm f=%d)\n", fact_count);
-    for(unsigned int i = 0; i < base_dim; ++i) {
-      set_matrix(exponents, fact_count, i, buffer_exp[i]);
-    //  printf("%u", buffer_exp[i]);
-    }
-    
-    MPI_Recv(buffer_As, BUFFER_DIM, MPI_UNSIGNED_CHAR, source, 
-    	     AS_TAG, MPI_COMM_WORLD, &status2);
-
-    MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
-    mpz_import(As[fact_count], count, 1, 1, 1, 0, buffer_As);
-    
-    //gmp_printf("- %Zd\n", fact_count, As[fact_count]);
+     
+    //printf("%d) ", fact_count+1);
+    //for(unsigned int k = 0; k < base_dim+1; ++k) {
+    //  printf("%d", buffer_exp[k]);
+    //}
     //printf("\n");
-    ++fact_count;
+
+   MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
+   if(buffer_exp[base_dim] == 1) {
+     ++n_finished;
+     //printf("n_f=%d, comm=%d\n", n_finished, comm_size);
+     if(n_finished >=  comm_size - 1) {
+       *n_fatt = fact_count;
+       return EVERYONE_FINISHED;
+     }
+   } else {
+     
+     /*
+       if(count == 0) {
+       //++n_finished;
+       //if(n_finished >=  comm_size - 1) {
+       //	*n_fatt = fact_count;
+       //	printf("f=%u c=%u fatt=%u\n", n_finished, comm_size-1, *n_fatt);
+     
+       //return EVERYONE_FINISHED;
+       //     }
+       }*/
+     
+    
+     //printf("Mm f=%d)\n", fact_count);
+     for(unsigned int i = 0; i < base_dim; ++i) {
+       set_matrix(exponents, fact_count, i, buffer_exp[i]);
+       //  printf("%u", buffer_exp[i]);
+     }
+    
+     MPI_Recv(buffer_As, BUFFER_DIM, MPI_UNSIGNED_CHAR, source, 
+	      AS_TAG, MPI_COMM_WORLD, &status2);
+
+     MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
+     mpz_import(As[fact_count], count, 1, 1, 1, 0, buffer_As);
+    
+     //gmp_printf("- %Zd\n", fact_count, As[fact_count]);
+     //printf("\n");
+     ++fact_count;
+   }
   }
+  // Spedisco '1' agli slave per indicare la terminazione
+  //char stop_signal = '1';
+  //MPI_Bcast(&stop_signal, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+  //printf("M) Sending stop_signal\n");
   *n_fatt = fact_count;
   return 0;
 }
@@ -94,7 +102,7 @@ unsigned long quadratic_sieve(mpz_t N,
   mpz_init(s);
   mpz_sqrt(s, N); 
 
-  t1 = omp_get_wtime();
+  t1 = MPI_Wtime();
   /* Individuazione primi in [2, n] */
   unsigned int * primes = malloc(sizeof(unsigned int) * n);  
   eratosthenes_sieve(primes, n);
@@ -120,7 +128,7 @@ unsigned long quadratic_sieve(mpz_t N,
 
   unsigned n_primes = base_fattori(N, s, factor_base, solutions,
 				  primes, n_all_primes);
-  t2 = omp_get_wtime();
+  t2 = MPI_Wtime();
   double t_base = t2 - t1; 
   printf("#dimensione base di fattori: %d\n", n_primes);
 
@@ -131,6 +139,7 @@ unsigned long quadratic_sieve(mpz_t N,
   /* Parte di crivello: troviamo le k+n fattorizzazioni complete */
   unsigned int n_fatt;
 
+  t1 = MPI_Wtime();
   if(rank == 0){
     /* Inizializzazioni vettori */
     init_matrix(& exponents, n_primes + max_fact, n_primes);
@@ -138,21 +147,22 @@ unsigned long quadratic_sieve(mpz_t N,
 
     /* Procedura master che riceve le fatt. complete */
     master(n_primes, max_fact, exponents, As, comm_size, & n_fatt);
+    //MPI_Abort(MPI_COMM_WORLD, 0);
   } else {
     unsigned int dom_decomp = poly_val_num / (comm_size-1);
     unsigned int final_point = dom_decomp * rank;
     unsigned int starting_point = final_point - dom_decomp;
 
-    printf("s=%d f=%d\n", starting_point, final_point);
+    //printf("s=%d f=%d\n", starting_point, final_point);
 
     n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
 			 final_point, max_fact, 
 			 interval, starting_point);
     // per gli slave l'algoritmo termina qui
-    //MPI_Finalize();
+    // MPI_Finalize();
     return IM_A_SLAVE;
   }
-  t2 = omp_get_wtime();
+  t2 = MPI_Wtime();
   double t_sieve = t2 - t1;
   printf("#numero fattorizzazioni complete trovate: %d\n", n_fatt);
   
@@ -163,7 +173,7 @@ unsigned long quadratic_sieve(mpz_t N,
   // }
   //printf("\n");
  
-  t1 = omp_get_wtime();
+  t1 = MPI_Wtime();
   /* Matrice di esponenti in Z_2 organizzata a blocchi di bit */ 
   word ** M;
   /* Numero di blocchi di bit da utilizzare */
@@ -199,7 +209,7 @@ unsigned long quadratic_sieve(mpz_t N,
   /* Eliminazione gaussiana */
   gaussian_elimination(exponents_mpz, M, As, N, 
 		       n_fatt, n_primes, n_blocchi, wt);
-  t2 = omp_get_wtime();
+  t2 = MPI_Wtime();
   double t_gauss = t2 - t1;
 
   /* In m ritorno un fattore non banale di N */

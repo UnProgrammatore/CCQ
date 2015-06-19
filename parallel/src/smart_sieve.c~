@@ -5,6 +5,63 @@
 #include <omp.h>
 
 unsigned int smart_sieve(
+<<<<<<< HEAD
+	mpz_t n,
+	unsigned int* factor_base,
+	unsigned int base_dim,
+	pair* solutions,
+	unsigned int poly_val_num,
+	unsigned int max_fact,
+	unsigned int intervals,
+	unsigned int startfrom
+	) {
+
+
+        printf("Quadratic sieve ");
+	int how_many_bytes;
+
+	unsigned int* buffer;
+	init_vector(&buffer, base_dim);
+	unsigned char* buffer_as;
+	buffer_as = malloc(sizeof(unsigned char) * BUFFER_DIM);
+
+	unsigned int i; // Indice generico
+
+	unsigned char go_on = 1;
+
+	unsigned int h; // Usato per copiare gli base_dim esponenti
+
+	unsigned int** expo2; // Matrice temporanea degli esponenti
+	init_matrix(&expo2, intervals, base_dim);
+	word** is_used_expo2; // Vettore che segna quali esponenti sono stati inizializzati
+	init_matrix_l(&is_used_expo2, 1, (intervals / N_BITS) + 1);
+
+	mpz_t n_root;
+	mpz_t intermed; // Valore appoggio
+	mpz_init(n_root);
+	mpz_init(intermed);
+	mpz_sqrt(n_root, n);
+
+	unsigned int fact_count = 0; // Numero fattorizzazioni trovate
+	unsigned int j, k, l; // Indici generici
+	mpz_t* evaluated_poly; // Vettore temporaneo dei Q(A) valutati
+	mpz_t* As2; // A + s temporanei
+	init_vector_mpz(&As2, intervals);
+
+	init_vector_mpz(&evaluated_poly, intervals);
+
+	max_fact += base_dim; // k + n
+
+	for(l = startfrom; l <= poly_val_num - intervals && go_on; l += intervals) {
+		for(i = 0; i < ((intervals / N_BITS) + 1); ++i) {
+			set_matrix_l(is_used_expo2, 0, i, 0);
+		}
+
+		for(i = 0; i < intervals; ++i) {
+			mpz_add_ui(intermed, n_root, i + l);
+			mpz_mul(intermed, intermed, intermed);
+			mpz_sub(evaluated_poly[i], intermed, n);
+=======
 			 mpz_t n,
 			 unsigned int* factor_base,
 			 unsigned int base_dim,
@@ -108,6 +165,7 @@ unsigned int smart_sieve(
 	  mpz_add_ui(intermed, n_root, i + l);
 	  mpz_mul(intermed, intermed, intermed);
 	  mpz_sub(evaluated_poly[i], intermed, n);
+>>>>>>> dd36f4cbf28bd01efd43d336a5ac41fb0450bfe6
 			
 	  mpz_add_ui(As2[i], n_root, i + l);
 	}
