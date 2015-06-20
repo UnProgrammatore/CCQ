@@ -3,19 +3,19 @@
 \label{sec:introduzione}
 %************************************************
 
--sicurezza
--perchè rsa
--perchè problema della fattorizzazione
--perchè quest'algoritmo
--Obiettivo implementazione
+%-sicurezza
+%-perchè rsa
+%-perchè problema della fattorizzazione
+%-perchè quest'algoritmo
+%-Obiettivo implementazione
 
 
--fattorizzazione
--conseguenze del problema (rsa)
--sicurezza
--Rompere rsa ( implementazione parallela qs rsa-challenge)
--ottimizzazione dell'algoritmo
-		( cluster // uso linux-mpi )
+%-fattorizzazione
+%-conseguenze del problema (rsa)
+%-sicurezza
+%-Rompere rsa ( implementazione parallela qs rsa-challenge)
+%-ottimizzazione dell'algoritmo
+%		( cluster // uso linux-mpi )
 
 
 Per il teorema fondamentale dell'Arimetica dato un numero N non primo, il quale possiede quindi dei divisori non banali, esiste ed è unica, prescindendo dall'ordine dei fattori, la sua fattorizzazione esprimibile come prodotto di numeri primi elevati ad opportune potenze.
@@ -37,14 +37,14 @@ Alice quindi cifra il messaggio con la propria chiave privata e successivamente 
 
 \end{itemize}
 
-Il funzionamento di RSA non è particolarmente complesso.
-Supponiamo che Alice e Bob stiano avendo un dialogo segreto, ossia non vogliono che un eventuale haker possa intercettare la loro comunicazione e comprenderne il significato.
-Sia quindi \emph{M} il messaggio che si vogliono scambiare.
-Ognuno di loro sceglie due numeri primi \emph{p} e \emph{q} li moltiplica tra di loro ottenendo \emph{N=p.q}.
-In seguito calcolano $\varphi( N)  = ( p-1)(q-1)$.
-Scelgono infine un numero \emph{e} coprimo con $\varphi(N)$ e minore dello stesso e calcolano \emph{d} tale per cui $e.d\equiv 1 mod(N)$.
-Ora $(N, e)$ è la chiave pubblica, mentre quella privata è $(N, d)$.
-Il messaggio visibile sulla rete è il seguente: $\exp(M,1)=\exp(M,e)mod(N)$ che verr\'{a} poi decifrato applicando una semplice esponenziazione di esponente \emph{d}, elemento della chiave pubblica del mittente.
+Il funzionamento di RSA non è particolarmente complesso. \\
+Supponiamo che Alice e Bob stiano avendo un dialogo segreto, ossia non vogliono che un eventuale haker possa intercettare la loro comunicazione e comprenderne il significato. \\
+Sia quindi \emph{M} il messaggio che si vogliono scambiare.  \\
+Ognuno di loro sceglie due numeri primi \emph{p} e \emph{q} li moltiplica tra di loro ottenendo \emph{N=p.q}. \\
+In seguito calcolano $\varphi( N)  = ( p-1)(q-1)$. \\
+Scelgono infine un numero \emph{e} coprimo con $\varphi(N)$ e minore dello stesso e calcolano \emph{d} tale per cui $e.d\equiv 1 mod(N)$. \\
+Ora $(N, e)$ è la chiave pubblica, mentre quella privata è $(N, d)$. \\
+Il messaggio visibile sulla rete è il seguente: $c=mex^e mod(N)$ che verr\'{a} poi decifrato applicando una semplice esponenziazione di esponente \emph{d}, elemento della chiave pubblica del mittente, ossia $mex=c^d mod(N)$.
 
 La sicurezza di quest'algoritmo risiede nella difficoltà computazionale di fattorizzare il numero \emph{N} nei suoi fattori primi e quindi nel trovare la funzione $\varphi(N)$
 che permetterebbe di trovare l'inverso moltiplicativo di \emph{e} e quindi rompere i sistema.
