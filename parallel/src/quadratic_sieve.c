@@ -139,6 +139,11 @@ unsigned long quadratic_sieve(mpz_t N,
   /* Parte di crivello: troviamo le k+n fattorizzazioni complete */
   unsigned int n_fatt;
 
+  //mpz_t from;
+  //mpz_init(from);
+  //mpz_t to;
+  //mpz_init(to);
+
   t1 = MPI_Wtime();
   if(rank == 0){
     /* Inizializzazioni vettori */
@@ -150,14 +155,21 @@ unsigned long quadratic_sieve(mpz_t N,
     //MPI_Abort(MPI_COMM_WORLD, 0);
   } else {
     unsigned int dom_decomp = poly_val_num / (comm_size-1);
-    unsigned int final_point = dom_decomp * rank;
-    unsigned int starting_point = final_point - dom_decomp;
+    unsigned int begin = dom_decomp * (rank-1);
+    //unsigned int starting_point = final_point - dom_decomp;
+
+    //mpz_t dom_dec;
+    //mpz_init(dom_dec);
+    mpz_t starting_point;
+    mpz_init(starting_point);
+
+    //mpz_set_ui(dom_dec, dom_decomp);
+    mpz_set_ui(starting_point, begin);
 
     //printf("s=%d f=%d\n", starting_point, final_point);
-
-    n_fatt = smart_sieve(N, factor_base, n_primes, solutions, 
-			 final_point, max_fact, 
-			 interval, starting_point);
+    n_fatt = smart_sieve(N, factor_base, n_primes, solutions,
+			 starting_point, dom_decomp,
+			 interval, max_fact);
     // per gli slave l'algoritmo termina qui
     // MPI_Finalize();
     return IM_A_SLAVE;
