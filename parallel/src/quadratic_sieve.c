@@ -32,7 +32,7 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
     //}
     //printf("\n");
 
-   MPI_Get_count(&status2, MPI_UNSIGNED_CHAR, &count);
+   MPI_Get_count(&status1, MPI_UNSIGNED_CHAR, &count);
    if(buffer_exp[base_dim] == 1) {
      ++n_finished;
      //printf("n_f=%d, comm=%d\n", n_finished, comm_size);
