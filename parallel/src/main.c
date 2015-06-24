@@ -45,12 +45,12 @@ int main(int argc, char ** argv) {
 static char *optstring = "n:b:k:i:r:p:h";
 
 
-if(argn == 1 ){
+if(argc == 1 ){
 show_usage();
 return 1;
 }
 
-string Nn;                  // numero da fattorizzare
+char* Nn;                  // numero da fattorizzare
 unsigned int n;             // numero di fattori in eratostene -n
 unsigned int poly_val_num;  // intervallo per la valutazione del polinomio -M
 unsigned int max_fact;      // numero di fattorizzazioni addizionali -k
@@ -111,10 +111,6 @@ mpz_set_str(N, Nn, 10);
 
 //gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
 
-unsigned int n = atoi(argv[3]);
-unsigned int poly_val_num = atoi(argv[4]);;
-unsigned int max_fact = atoi(argv[5]);
-unsigned int interval = atoi(argv[6]);
 
 
 mpz_t N1;
