@@ -54,8 +54,9 @@ void add_vector_z(mpz_t ** M, unsigned long k,
     
     set_matrix_mpz(M, k, i, sum);
   }
-  
-  mpz_clears(sum, x, y, NULL);
+  mpz_clear(sum);
+  mpz_clear(x);
+  mpz_clear(y);
 }
 
 void get_wt_k(word ** M, unsigned long k, unsigned long n_col, 
@@ -166,6 +167,9 @@ unsigned factorization(mpz_t N, // numero da fattorizzare
 	return 1;
       }
     }
-  
-  mpz_clears(mpz_temp, exp, q, mpz_prime, X, Y, NULL);
+  mpz_clear(exp);
+  mpz_clear(q);
+  mpz_clear(mpz_prime);
+  mpz_clear(X);
+  mpz_clear(Y);
 }

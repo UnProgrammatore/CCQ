@@ -41,10 +41,9 @@ int main(int argc, char ** argv) {
   //gmp_printf("N: %Zd = %Zd * %Zd \n", N, P1, P2);
 
   unsigned int n = atoi(argv[3]);
-  unsigned int poly_val_num = atoi(argv[4]);;
   unsigned int max_fact = atoi(argv[5]);
-  unsigned int interval = atoi(argv[6]);
-
+  unsigned int block_size = atoi(argv[6]);
+  unsigned int interval = atoi(argv[4]);
  
   mpz_t N1;
   mpz_t N2;
@@ -52,7 +51,7 @@ int main(int argc, char ** argv) {
   mpz_init(N2);
 
   t1 = omp_get_wtime();
-  int status = quadratic_sieve(N, n, poly_val_num, max_fact, interval, N1);
+  int status = quadratic_sieve(N, n, interval, max_fact, block_size, N1);
   //printf("ho finito %d stat = %d\n", rank, status);
   t2 = omp_get_wtime();
   double time = t2 - t1;
@@ -80,8 +79,6 @@ int main(int argc, char ** argv) {
     retvalue = 0;
   }
 
-  if(rank == 0)
-  	MPI_Abort(MPI_COMM_WORLD, 0);
   MPI_Finalize();
   exit(0);
 }

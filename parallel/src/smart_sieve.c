@@ -2,18 +2,6 @@
 #include "../include/linear_algebra.h"
 #include "../include/matrix.h"
 
-/*  
- *
- * begin                        end
- * |______________________________|  size = interval
- *
- * begin_thread   end_thread
- * |______________|                  size = dom_decomp = interval / n_threads
- *                
- *             l  end_block
- * |__||__||__||__|                  size = block_size    
- */
-
 unsigned int smart_sieve(mpz_t n,
 			 unsigned int* factor_base,
 			 unsigned int base_dim,
@@ -21,10 +9,10 @@ unsigned int smart_sieve(mpz_t n,
 			 mpz_t begin,
 			 unsigned int interval,
 			 unsigned int block_size,
-			 unsigned int max_fact
-			 ) {
+			 unsigned int max_fact) {
   mpz_t end;
   mpz_init(end);
+
   // questo processo mpz deve prendere A in [begin, end]
   mpz_add_ui(end, begin, interval); // end = begin + interval
 
@@ -32,12 +20,19 @@ unsigned int smart_sieve(mpz_t n,
   mpz_init(n_root);
   mpz_sqrt(n_root, n);
 
-  #pragma omp parallel //num_threads(1)
+  int stop_flag = 0;
+  char stop_signal;
+  MPI_Request request;
+  MPI_Status status;
+  MPI_Irecv(&stop_signal, 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &request);
+  
+  /* Inizio della parte di codice eseguita da ogni thread */
+  #pragma omp parallel
   { 
 
     /* Dichiarazione dei buffer per la trasmissione */
     unsigned int* buffer; // buffer per le fattorizzazioni
-    init_vector(&buffer, base_dim + 1); // dim+1 per il flag di controllo della fine
+    init_vector(&buffer, base_dim); // dim+1 per il flag di controllo della fine
     unsigned char* buffer_as; // buffer per (A + s)
     buffer_as = malloc(sizeof(unsigned char) * BUFFER_DIM);
 
@@ -104,7 +99,7 @@ unsigned int smart_sieve(mpz_t n,
     mpz_add_ui(begin_thread, begin, dom_decomp * thread_id); // begin_thread = begin + (dom_decomp * thread_id)
     mpz_add_ui(end_thread, begin_thread, dom_decomp); // end_thread = begin_thread + dom_decomp
     //gmp_printf("begin=%Zd, end=%Zd, interval=%d, block_size=%d\n", begin, end, interval, block_size);
-    gmp_printf("%d) begin_thread=%Zd, end_thread=%Zd, dom_decmp=%d\n", thread_id, begin_thread, end_thread, dom_decomp);
+    //gmp_printf("%d) begin_thread=%Zd, end_thread=%Zd, dom_decmp=%d\n", thread_id, begin_thread, end_thread, dom_decomp);
     //printf("###originali\n");
     mpz_pair * solutions_ = malloc(sizeof(mpz_pair) * base_dim);
     for(i = 0; i < base_dim; ++i) {
@@ -142,7 +137,7 @@ unsigned int smart_sieve(mpz_t n,
     mpz_sub_ui(last_block, end_thread, block_size); // last_block = end_thread - block_size
 
     // for(l = begin_thread; l < last_block && go_on; l += block_size)
-    for(mpz_set(l, begin_thread); (mpz_cmp(l, last_block) < 0) && go_on /*&& (flag == 0)*/; mpz_add_ui(l, l, block_size)) {
+    for(mpz_set(l, begin_thread); (mpz_cmp(l, last_block) < 0) && go_on && (stop_flag == 0); mpz_add_ui(l, l, block_size)) {
       for(i = 0; i < ((block_size / N_BITS) + 1); ++i) { // Reset righe usate
 	set_matrix_l(used_rows, 0, i, 0);
       }
@@ -193,7 +188,7 @@ unsigned int smart_sieve(mpz_t n,
 	  index = mpz_get_ui(index_mpz); // Siccome (j - l) < block_size è un uint sicuro
 
 	  while(mpz_divisible_ui_p(evaluated_poly[index], factor_base[i])) {
-  //gmp_printf("\t\tQ(A) = %Zd / %d = ", evaluated_poly[index], factor_base[i]);
+            //gmp_printf("\t\tQ(A) = %Zd / %d = ", evaluated_poly[index], factor_base[i]);
 	    if(get_k_i(used_rows, 0, index) == 0) { // Se non sono mai stati usati gli esponenti
 	      for(k = 0; k < base_dim; ++k)
 		set_matrix(exponents, index, k, 0);
@@ -214,7 +209,6 @@ unsigned int smart_sieve(mpz_t n,
 	  ++fact_count;
 	  for(k = 0; k < base_dim; ++k)
 	    buffer[k] = get_matrix(exponents, i, k);
-	  buffer[k] = 0; // L'ultimo numero a 0 indica al master che lo slave non ha terminato
 
 	  /* MPI_Send */
           #pragma omp critical 
@@ -224,26 +218,13 @@ unsigned int smart_sieve(mpz_t n,
 	    *buffer_as = 0;
 	    mpz_export(buffer_as, NULL, 1, 1, 1, 0, As[i]);
 	    MPI_Send(buffer_as, n_bytes, MPI_UNSIGNED_CHAR, 0, AS_TAG, MPI_COMM_WORLD);
+
+	    if(stop_flag == 0)
+	      MPI_Test(&request, &stop_flag, &status);
 	  }
 	}
       }
-
-      char stop_signal;
-      MPI_Request request;
-      MPI_Status status;
-	
-      //MPI_Irecv(&stop_signal, 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &request);
-      //MPI_Test(&request, &flag, &status);
-      
-      //printf("flag = %d\n", flag);
-      
-    }
-    //printf("#%d)\n", thread_id);	      
+    }	      
   }
-
-  // spedisco una riga del tipo [X X X X ... X 1] per indicare la terminazione
-  unsigned int end_buffer[base_dim+1];
-  end_buffer[base_dim] = 1;
-  MPI_Send(end_buffer, base_dim+1, MPI_UNSIGNED, 0, ROW_TAG, MPI_COMM_WORLD);
-  return 0;
+  return stop_flag;
 }
