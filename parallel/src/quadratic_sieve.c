@@ -126,21 +126,12 @@ unsigned long quadratic_sieve(mpz_t N,
     //gmp_printf("%d) begin=%Zd interval=%d\n", rank, begin, interval);
 
     int stop_flag = 0;
-    //char stop_signal;
-    //MPI_Request request;
-    //MPI_Status status;
-    //MPI_Irecv(&stop_signal, 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &request);
-
     do {
       //gmp_printf("\t%d) [%Zd, %Zd+%d] - (flag=%d)\n", rank, begin, begin, interval, flag);
       stop_flag = smart_sieve(N, factor_base, n_primes, solutions,
 		  begin, interval,
 		  block_size, max_fact);
       mpz_add_ui(begin, begin, interval * (comm_size-1));
-      
-      //if(stop_flag == 0)
-      //	MPI_Test(&request, &stop_flag, &status);
-
     } while(!stop_flag);
 
     printf("#%d) Termina\n", rank);
