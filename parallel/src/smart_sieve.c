@@ -137,34 +137,39 @@ unsigned int smart_sieve(mpz_t n,
     mpz_sub_ui(last_block, end_thread, block_size); // last_block = end_thread - block_size
 
     // for(l = begin_thread; l < last_block && go_on; l += block_size)
-    for(mpz_set(l, begin_thread); (mpz_cmp(l, last_block) < 0) && go_on && (stop_flag == 0); mpz_add_ui(l, l, block_size)) {
+    for(mpz_set(l, begin_thread); 
+       (mpz_cmp(l, last_block) < 0) && go_on && !stop_flag; 
+       mpz_add_ui(l, l, block_size)) {
+
       for(i = 0; i < ((block_size / N_BITS) + 1); ++i) { // Reset righe usate
 	set_matrix_l(used_rows, 0, i, 0);
       }
-
+      
       mpz_add_ui(end_block, l, block_size); // end_block = l + block_size
       //gmp_printf("l=%Zd < %Zd [%Zd, %Zd)\n", l, last_block, l, end_block);
-
+      
       for(i = 0; i < block_size; ++i) { // Calcolo Q(A) e (A + s) per A in [l, l + block_size]
 	mpz_add_ui(A, l, i); // A = i + l
 	mpz_add(intermed, n_root, A); // A + s
 	mpz_set(As[i], intermed);
 	mpz_mul(intermed, intermed, intermed); // (A + s)^2
 	mpz_sub(evaluated_poly[i], intermed, n);
-
+	
 	//gmp_printf("Q(%Zd)=%Zd, ", A, evaluated_poly[i]);
       }
       //printf("\n");
-
-      for(i = 0; i < base_dim && go_on; ++i) {
-
+      
+      for(i = 0; i < base_dim && go_on && !stop_flag; ++i) {	
 	/* Sieve con Xp */
 	// for(j = solutions_[i].sol1; j < end_block && go_on; j += factor_base[i])
-	for(mpz_set(j, solutions_[i].sol1); (mpz_cmp(j, end_block) < 0) && go_on; mpz_add_ui(j, j, factor_base[i])) {
+	for(mpz_set(j, solutions_[i].sol1);
+           (mpz_cmp(j, end_block) < 0) && go_on && !stop_flag; 
+	   mpz_add_ui(j, j, factor_base[i])) {
+
           //gmp_printf("\txp) j=%Zd < %Zd [+=%d](j, end_block)\n", j, end_block, factor_base[i]);
 	  mpz_sub(index_mpz, j, l);
 	  index = mpz_get_ui(index_mpz); // Siccome (j - l) < block_size è un uint sicuro
-
+	  
 	  while(mpz_divisible_ui_p(evaluated_poly[index], factor_base[i])) {
             //gmp_printf("\t\tQ(A) = %Zd / %d = ", evaluated_poly[index], factor_base[i]);
 	    if(get_k_i(used_rows, 0, index) == 0) { // Se non sono mai stati usati gli esponenti
@@ -172,7 +177,7 @@ unsigned int smart_sieve(mpz_t n,
 		set_matrix(exponents, index, k, 0);
 	      set_k_i(used_rows, 0, index, 1);
 	    }
-
+	    
 	    set_matrix(exponents, index, i, get_matrix(exponents, index, i) + 1); // ++exponents[j][i]
 	    mpz_divexact_ui(evaluated_poly[index], evaluated_poly[index], factor_base[i]); // Q(A) = Q(A) / p
 	    //gmp_printf("%Zd  (poly[%d])\n", evaluated_poly[index], index);
@@ -182,7 +187,10 @@ unsigned int smart_sieve(mpz_t n,
 
 	/* Sieve con Yp */
 	// for(j = solutions_[i].sol2; j < end_block && go_on; j += factor_base[i])
-	for(mpz_set(j, solutions_[i].sol2); factor_base[i] != 2 && (mpz_cmp(j, end_block) < 0) && go_on; mpz_add_ui(j, j, factor_base[i])) {
+	for(mpz_set(j, solutions_[i].sol2); 
+            factor_base[i] != 2 && (mpz_cmp(j, end_block) < 0) && go_on && !stop_flag; 
+	    mpz_add_ui(j, j, factor_base[i])) {
+
           //gmp_printf("\txp) j=%Zd < %Zd [+=%d](j, end_block)\n", j, end_block, factor_base[i]);
 	  mpz_sub(index_mpz, j, l);
 	  index = mpz_get_ui(index_mpz); // Siccome (j - l) < block_size è un uint sicuro
@@ -221,10 +229,38 @@ unsigned int smart_sieve(mpz_t n,
 
 	    if(stop_flag == 0)
 	      MPI_Test(&request, &stop_flag, &status);
+	    //printf("%d) checking stop_signal = %d\n", thread_id, stop_signal);
 	  }
 	}
       }
-    }	      
+     
+    }
+
+    mpz_clear(begin_thread);
+    mpz_clear(end_thread);
+    mpz_clear(end_block);
+    mpz_clear(intermed);
+    mpz_clear(A);    
+    mpz_clear(l);
+    mpz_clear(j);
+    mpz_clear(begin_solution1);
+    mpz_clear(begin_solution2);
+    mpz_clear(index_mpz);
+
+    free(buffer);
+    free(buffer_as);
+
+    finalize_matrix(&exponents, base_dim);
+    finalize_matrix_l(&used_rows, (block_size / N_BITS) + 1);
+
+    for(unsigned int u = 0; u < block_size; u++) {
+      mpz_clear(evaluated_poly[u]);
+      mpz_clear(As[u]);
+    }
   }
+
+  mpz_clear(end);
+  mpz_clear(n_root);
+
   return stop_flag;
 }

@@ -2,7 +2,7 @@
 
 unsigned int master(unsigned int base_dim, unsigned int max_fact, 
 		    unsigned int** exponents, mpz_t * As,
-		    int comm_size) {
+		    int comm_size, unsigned int print_fact) {
 
   unsigned int fact_count = 0;
 
@@ -10,20 +10,29 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
 
   int count;
   int source;
-
+  
   /* Buffer per ricevere gli esponenti */
   unsigned int* buffer_exp;
   /* Buffer per ricevere (A + s) */
   unsigned char buffer_As[BUFFER_DIM];
   init_vector(& buffer_exp, base_dim);
 
+  double t1 = MPI_Wtime();
+  double t2;
+
   while(fact_count < max_fact + base_dim) {
     /* Ricevo il vettore di esponenti */
-    MPI_Recv(buffer_exp, base_dim, MPI_UNSIGNED, 
+    MPI_Recv(buffer_exp, base_dim, MPI_UNSIGNED,
 	     MPI_ANY_SOURCE, ROW_TAG, 
 	     MPI_COMM_WORLD, &status);
     source = status.MPI_SOURCE;
-    //printf("M) %d\n", fact_count);
+
+    if(fact_count % print_fact == 0) {
+      t2 = MPI_Wtime() - t1;
+      
+      printf("#M) %d/%d in %.6f seconds\n", fact_count, max_fact + base_dim, t2);
+    }
+    
     for(unsigned int i = 0; i < base_dim; ++i) 
       set_matrix(exponents, fact_count, i, buffer_exp[i]);
     
@@ -50,7 +59,8 @@ unsigned long quadratic_sieve(mpz_t N,
 			      unsigned interval,
 			      unsigned int max_fact,
 			      unsigned int block_size,
-			      mpz_t m) {
+			      mpz_t m,
+			      unsigned int print_fact) {
   double t1, t2;
   
   int rank;
@@ -114,7 +124,7 @@ unsigned long quadratic_sieve(mpz_t N,
     init_vector_mpz(& As, n_primes + max_fact);
 
     /* Procedura master che riceve le fatt. complete */
-    n_fatt = master(n_primes, max_fact, exponents, As, comm_size);
+    n_fatt = master(n_primes, max_fact, exponents, As, comm_size, print_fact);
   } else {
     mpz_t begin;
     mpz_init(begin);
@@ -194,11 +204,9 @@ unsigned long quadratic_sieve(mpz_t N,
   printf("%.6f\n", t_base + t_gauss + t_sieve);
   
   if(n_fact_non_banali > 0) {
-    /* Pulizia della memoria */
     return OK;
   }
   else {
-    /* Pulizia della memoria */
     return SOLO_FATTORIZZAZIONI_BANALI;
   }
 }
