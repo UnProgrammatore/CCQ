@@ -36,7 +36,8 @@ master(unsigned int base_dim, // Dimensione base fattori
        unsigned int max_fact, // Numero massimo di fattorizzazioni cercate
        unsigned int** exponents, // Matrice di esponenti 
        mpz_t * As, // Vettore degli (A + s)
-       int comm_size); // dimensione del cluster
+       int comm_size, // dimensione del cluster
+       unsigned int print_fact); // Ogni quante fact trovate stampa un avviso 
 		   
 
 unsigned long 
@@ -45,6 +46,7 @@ quadratic_sieve(mpz_t N, // Numero da fattorizzare
 		unsigned interval, // Intervallo per A di ricerca
 		unsigned int max_fact, // Numero di fatt. complete da trovare
 		unsigned int block_size, // Intervalli in cui spezzare sieve
-		mpz_t m); // Fattore primo eventualmente trovato
+		mpz_t m, // Fattore primo eventualmente trovato
+		unsigned int print_fact); // Ogni quante fact trovate stampa un avviso 
 
 #endif // QUADRATIC_SIEVE_H
