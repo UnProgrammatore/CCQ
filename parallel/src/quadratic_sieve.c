@@ -20,18 +20,16 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
   double t1 = MPI_Wtime();
   double t2;
 
+  int fact_per_rank[comm_size];
+  for(int i = 0; i < comm_size; ++i)
+    fact_per_rank[i] = 0;
+
   while(fact_count < max_fact + base_dim) {
     /* Ricevo il vettore di esponenti */
     MPI_Recv(buffer_exp, base_dim, MPI_UNSIGNED,
 	     MPI_ANY_SOURCE, ROW_TAG, 
 	     MPI_COMM_WORLD, &status);
     source = status.MPI_SOURCE;
-
-    if(fact_count % print_fact == 0) {
-      t2 = MPI_Wtime() - t1;
-      
-      printf("#M) %d/%d in %.6f seconds\n", fact_count, max_fact + base_dim, t2);
-    }
     
     for(unsigned int i = 0; i < base_dim; ++i) 
       set_matrix(exponents, fact_count, i, buffer_exp[i]);
@@ -43,6 +41,13 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
     mpz_import(As[fact_count], count, 1, 1, 1, 0, buffer_As);
     
     ++fact_count;
+    ++fact_per_rank[source];
+
+    if(fact_count % print_fact == 0) {
+      t2 = MPI_Wtime() - t1;
+      
+      printf("#%d/%d in %.6f seconds\n", fact_count, max_fact + base_dim, t2);
+    }
   }
   
   /* Spedisco '1' agli slave per indicare la terminazione */
@@ -50,7 +55,16 @@ unsigned int master(unsigned int base_dim, unsigned int max_fact,
   for(unsigned int i = 1; i < comm_size; ++i)
     MPI_Send(&stop_signal, 1, MPI_CHAR, i, 0, MPI_COMM_WORLD);
   
-  printf("#M) Sending stop_signal\n");
+  printf("#Sending stop_signal\n");
+
+  printf("#Fattorizzazioni per ranks:\n#");
+  for(int i = 1; i < comm_size; ++i)
+    printf("%d \t", i);
+  printf("\n#");
+  for(int i = 1; i < comm_size; ++i)
+    printf("%d \t", fact_per_rank[i]);
+  printf("\n");
+ 
   return fact_count;
 }
 
@@ -144,7 +158,7 @@ unsigned long quadratic_sieve(mpz_t N,
       mpz_add_ui(begin, begin, interval * (comm_size-1));
     } while(!stop_flag);
 
-    printf("#%d) Termina\n", rank);
+    //printf("#%d) Termina\n", rank);
 
     return IM_A_SLAVE;
   }
