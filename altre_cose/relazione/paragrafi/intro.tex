@@ -51,3 +51,10 @@ che permetterebbe di trovare l'inverso moltiplicativo di \emph{e} e quindi rompe
 
 Nel 1991 la RSA Laboratories propose come sfida la fattorizzazione di 54 semiprimi ( prodotti di due primi ) con un numero di cifre compreso tra 100 e 617.
 Ad oggi solo i 12 pi\'{u} piccoli sono stati fattorizzati e, nonostante il 2007 vide la chiusura dell'RSA Challenge in molti ancora si dilettano nel tentativo di fattorizzarli.
+
+L'algoritmo che ci proponiamo di implementare è il Crivello quadratico di Pomerance, uno dei più veloci algoritmi di fattorizzazione ad oggi conosciuto, assieme al crivello con campi di numeri.
+Questi algoritmi sono subesponenziali, il crivello nella fattispecie, dato N il numero da fattorizzare ha un costo temporale nell'ordine di $e*sqrt(log(N)log(log(N))$.
+
+Se un haker riuscisse ad intercettare i messaggi crittati con RSA, conoscendo la chiave pubblica del mittente,
+potrebbe rompere il sistema fattorizzando il primo elemento della chiave stessa, ossia N.
+Fattorizzando N otterrebbe i suoi fattori primi p e q, e potrebbe calcolare $\varphi(N)$, per poter quindi calcolare l'inverso moltiplicativo della seconda parte della chiave, \emph(e) modulo $\varphi(N)$

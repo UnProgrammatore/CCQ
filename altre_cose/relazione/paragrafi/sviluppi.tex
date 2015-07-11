@@ -1,10 +1,26 @@
-%************************************************
+3%************************************************
 \section{Sviluppi futuri}
 \label{sec:sviluppi}
 %************************************************
 
-\lipsum[1]
 
+L'algoritmo si presta a diversi sviluppi orientati sia al miglioramento delle prestazioni che al miglioramento dell'interfaccia
+con l'utente.
 
+In merito alle prestazioni la prima modifica utile che potrebbe essere apportata è la seguente:
+l'architettura del sistema in questo momento è di tipo master slave, nella fattispecie il master svolge semplicemente il compito di suddividere  
+i dati e di recuperarli per poi eseguire la parte seriale dell'algoritmo, ossia l'eliminazione Gaussiana.
+Sarebbe utile modificare l'algoritmo affinchè nel tempo di attesa anche il processo master eseguisse la parte degli slave così da ottimizzare
+l'uso delle cpu.
 
+Considerando l'esecuzione dell'algoritmo in parallelo sui nodi di un supercomputer occorre considerare il problema del walltime, ossia
+del tempo massimo assegnato ad un processo dal gestore di code.
+Se il processo supera il walltime senza aver terminato correttamente l'esecuzione viene killato.
+Questo è un problema piuttosto notevole se si tratta di algoritmi che richiedono diversi giorni di calcolo su determinati dati; occorre quindi
+permettere all'algoritmo di crearsi dei checkpoint facendo un salvataggio dei dati intermedi per poi riprendere la computazione dal punto in 
+cui era stato bloccato.
+
+/*
+        DETTAGLI TECNICI
+*/
 
