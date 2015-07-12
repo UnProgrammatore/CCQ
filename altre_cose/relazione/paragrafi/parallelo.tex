@@ -3,17 +3,188 @@
 \section{Algoritmo parallelizzato}
 \label{sec:parallelo}
 %************************************************
+Descriveremo l'architettura parallela dell'algoritmo.
+\subsection{Base di fattori}
+Il nodo master potrebbe ricercare la base di fattori ed inviare il
+vettore di primi validi ai restanti nodi slave del cluster. Siccome
+gli slave resterebbero inattivi fino alla ricezione della base, in
+questa implementazione parallela si è deciso di far determinare la
+base di fattori ad ogni nodo indipendentemente. Tutti i nodi
+impiegheranno un tempo circa uguale per determinarla e inizieranno
+subito la parte successiva dell'algoritmo evitando il trasferimento di
+questi dati.
+\subsection{Il ruolo del nodo master}
+Il nodo master entra in una procedura che colleziona i risultati
+provenienti dagli slave durante la fase di crivello. Ricordiamo che in
+questa parte si deve ricercare per quali valori di A il polinomio Q(A)
+si fattorizza completamente sulla base di fattori. I nodi effettuano
+dunque le fattorizzazioni sui vari valori di A in simultanea ed
+inviano il vettore degli esponenti e il vettori con i (A + s)
+calcolati. Sono necessarie K+10 fattorizzazioni per proseguire
+nell'algoritmo (dove K è la dimensione della base di fattori) dunque
+una volta collezionato tale numero di risultati, il master interrompe
+l'ascolto dei messaggi MPI in arrivo dagli slave ed invia un segnale
+di stop a tutti indicando di concludere la procedura di crivello.
 
-L'algoritmo ha una particolarit\'{a} molto utile sotto l'aspetto della complessita temporale:
-la sezione del codice deputata alla valutazione del polinomio $Q(A)$ è fortemente parallelizzabile.
-Per ottenere le congruenze necessarie dobbiamo scomporre un numero notevole di polinomi valutati 
-sulla base di fattori FB.
-Questa parte del lavoro pu\'{o} essere fortemente parallelizzata in quanto aumentando 
-il lavoro demandato ai singoli processori è essenzialmente quello di valutare e scomporre i polinomi
-su intervalli diversi; questo permette di demandare un notevole calcolo ai nodi paralleli e quindi uno speed-up notevole all'aumentare del numero di nodi.
-per quanto la parte appena successiva, quella di eliminazione gaussiana è intrinsecamente seriale.
+Terminata la parte di "accumulo dei risultati" la parte parallela
+dell'algortimo finisce e l'esecuzione riprende come nella versione
+seriale. La parte di eliminazione gaussiana e quella finale di calcolo
+delle congruenze non è infatti parallelizzabile.
 
+In dettaglio, estratto dal file \texttt{quadratic\char`_sieve.c}, la procedura
+di ricezione del master:
+\begin{lstlisting}
+while(fact_count < max_fact + base_dim) {
+    /* Ricevo il vettore di esponenti */
+    MPI_Recv(buffer_exp, base_dim, MPI_UNSIGNED,
+	     MPI_ANY_SOURCE, ROW_TAG, 
+	     MPI_COMM_WORLD, &status);
+    source = status.MPI_SOURCE;
+    /* Salvo il contenuto del buffer */
+    for(unsigned int i = 0; i < base_dim; ++i) 
+      set_matrix(exponents, fact_count, i, buffer_exp[i]);
+    /* Ricevo l'mpz contenente (A + s) */
+    MPI_Recv(buffer_As, BUFFER_DIM, MPI_UNSIGNED_CHAR, source, 
+	     AS_TAG, MPI_COMM_WORLD, &status);
+    /* Estrapolo la dimensione del vettore mpz */
+    MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &count);
+    /* Lo "importo" mediante questa primitiva della libreria */
+    mpz_import(As[fact_count], count, 1, 1, 1, 0, buffer_As);
+    ++fact_count;
+}
+\end{lstlisting}
+Sono presenti due tag per le chiamte a \texttt{MPI\char`_Recv} per forzare la
+ricezione in sequenza di un vettore di esponenti, il \texttt{ROW\char`_TAG}, ed un
+vettore di (A + s), \texttt{l'AS\char`_TAG}. Viene estratto l'id del mittente dalla
+ricezione del vettore degli esponenti. Questo è necessario per
+prelevare il vettore degli (A + s) relativo agli stessi dati. Altri
+vettori (A + s) potrebbero essere giunti primi nella coda di ricezione
+da altri slave diversi rispetto a quello di cui stiamo considerando il
+vettore degli esponenti. \'E fondamentale l'associazione vettore
+esponenti e vettore (A + s).
 
-%\lstinputlisting{smart_sieve.c}
-\lstinputlisting[language=c++]{../../parallel/src/smart_sieve.c}
+Sorge tuttavia una problematica di uso efficiente delle risorse. Il
+nodo master resta in attesa delle fattorizzazioni durante la fase di
+crivello, queste fattorizzazione - per numeri sufficientemente grossi
+- sono più "rarefatte", lasciando quindi il processore del nodo
+inattivo per la maggior parte del tempo. Una soluzione a questo
+problema che non preveda alcuna modifica al codice è la seguente:
+si lanciano i processi mpi e si istruisce il gestore delle code
+(qualora preveda questa opzione)  di attivare un singolo processo 
+per nodo ad eccezione del master. Su questo infatti sarà lanciato un
+secondo processo mpi che occuperà i tempi di inattvità della cpu
+dovuti al primo processo in attesa, ricercando anch'esso
+fattorizzazioni per i Q(A). Nell'implementazione dell'algoritmo
+proposta, questa soluzione non è
+attuabile con  successo poichè \texttt{MPI\char`_Recv} effettua un attesa attiva
+consumando comunque il 100\% della risorsa cpu. Si potrebbe sostituire
+la \texttt{MPI\char`_Recv} con la ricezione asincrona e mandare in sleep il processo
+per un lasso di tempo fissato forzando un attessa che, seppur sempre
+attiva, avvenga con frequenza inferiore.
+\subsection{Il ruolo dei nodi slave}
+Il crivello è la parte più onerosa di tutto l'algoritmo. Viene
+richiesto di provare svariati valori di A per tentare di fattorizzare
+completamente il polinomio Q(A) calcolato. Possiamo considerare un
+dominio di valore di A che è l'intervallo [0, M] e decomporlo in
+tante parti quanti sono i nodi slave del cluster. Lo slave i-mo
+effettuerà i calcoli parallelamente agli altri sui valori di A in [Bi, Fi].
+Si calcola il polinomio Q(A), si cerca di fattorizzarlo sulla base di
+fattori. Nella versione seriale dalla procedura di crivello, si
+ritornavano due strutture dati contenenti i vettori degli esponenti
+delle fattorizzazioni e il vettore degli (A + s). Nella versione
+parallela memorizzeremo temporaneamente queste "soluzioni" per poi
+inviarle al master, tramite MPI, ogni volta che si saranno tentati n valori
+di A. Il comportamento della funzione di crivello parallelo è identico
+alla controparte parallela con la differenza che anzichè salvare i risutlati
+in una struttura dati si inviano mediante il protocollo MPI al nodo master.
 
+L'architettura del nostro sistema è però ibrida: abbiamo svariati
+processi MPI al cui interno girano svariati thread. Analizzeremo più nel
+dettaglio come sarà decomposto il dominio dei valori di A per
+assegnare un pezzo a ciascun processo e, al loro interno, a ciascun
+thread.
+\subsection{Decomposizione del dominio}
+La prima suddivisione del dominio: a livello di processo MPI.
+\begin{lstlisting}
+mpz_set_ui(begin, interval * (rank - 1));
+do {
+   stop_flag = smart_sieve(N, factor_base, n_primes, solutions,
+                	  begin, interval,
+		  	  block_size, max_fact);
+
+   mpz_add_ui(begin, begin, interval * (comm_size-1));
+} while(!stop_flag);
+\end{lstlisting}
+Supponiamo di considerare lo slave i-mo. Il rank di tale slave sarà
+i+1 (per via della presenza del master). Il parametro "interval"
+rappresenta il blocco di valori di A che ogni slave utilizza alla
+volta. Lo slave i-mo inizialmente autodetermina in base al suo
+rank l'intervallo sul quale deve operare assegnando alla variabile
+"begin" il valore "interval * i" (si ricorda che rank = i + 1).
+La funzione \texttt{smart\char`_sieve} operà dunque sull'intervallo [begin, begin +
+  interval]. Se nessun segnale di stop è arrivato dal master lui
+autodetermina l'intervallo successivo da esaminare tenendo conto della
+presenza degli altri nodi facendo \texttt{begin = begin + (interval *
+comm\char`_size - 1)}. La variabile \texttt{comm\char`_size} contiene la dimensione del
+cluster alla quale va tolto il nodo master che non esegue il crivello.
+
+Passiamo ora alla seconda suddivisione: a livello di thread.
+\begin{lstlisting}
+/* Inizio della parte di codice eseguita da ogni thread */
+#pragma omp parallel
+{ 
+  /* ... */
+ 
+  int threads = omp_get_num_threads();
+  int thread_id = omp_get_thread_num();
+  unsigned int dom_decomp = interval / (threads);
+  /* begin_thread = begin + (dom_decomp * thread_id) */
+  mpz_add_ui(begin_thread, begin, dom_decomp * thread_id); 
+  /* end_thread = begin_thread + dom_decomp */
+  mpz_add_ui(end_thread, begin_thread, dom_decomp); 
+
+  /* Parte d crivello */
+  /* ... */
+}
+\end{lstlisting}
+Similmente a come avveniva a livello di processi MPI, l'intervallo di
+dati (parametro "interval") sul quale viene chiamato
+\texttt{smart\char`_sieve} viene suddiviso in tanti pezzi quanti i thread
+disponibili nel processore.
+\subsection{Trasmissione dati al master}
+\begin{lstlisting}
+for(i = 0; i < block_size; ++i) {
+  /* Se Q(A) e' stato fattorizzato completamente */
+  if(mpz_cmp_ui(evaluated_poly[i], 1) == 0) {
+    ++fact_count;
+    /* Carico i dati degli esponenti nel buffer */
+    for(k = 0; k < base_dim; ++k)
+      buffer[k] = get_matrix(exponents, i, k);
+
+    /* MPI_Send */
+    #pragma omp critical 
+    {
+      MPI_Send(buffer, base_dim, MPI_UNSIGNED, 
+               0, ROW_TAG, MPI_COMM_WORLD);
+      n_bytes = (mpz_sizeinbase(As[i], 2) + 7) / 8;
+      *buffer_as = 0;
+      mpz_export(buffer_as, NULL, 1, 1, 1, 0, As[i]);
+      MPI_Send(buffer_as, n_bytes, MPI_UNSIGNED_CHAR, 
+               0, AS_TAG, MPI_COMM_WORLD);
+      /* Effettuo il controllo sul segnale di stop del master */
+      if(stop_flag == 0)
+        MPI_Test(&request, &stop_flag, &status);
+    }
+  }
+}
+\end{lstlisting}
+L'invio del vettore degli esponenti e del vettore degli (A + s)
+avviene solo al termine di ogni blocco. Come nella versione seriale, 
+per minimizzare la dimensione delle strutture dati, l'algoritmo
+procede per blocchi di dati di dimensione \texttt{block\char`_size}. Siccome
+le primitive di MPI non sono thread safe, è stato necessario eseguire
+la parte di invio dei dati in mutua esclusione tra
+thread (omp critical). Come detto nel paragrafo sul master, si nota
+che sono presenti due tag MPI per discriminare quale
+tipo di dato è stato inviato, se il vettore degli esponenti oppure il
+vettore (A + s).
