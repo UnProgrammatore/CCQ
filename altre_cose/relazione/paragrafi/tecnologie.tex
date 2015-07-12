@@ -3,6 +3,8 @@
 \label{sec:tecnologie}
 %************************************************
 
+\begin{fushleft}
+
 \subsection{OpenMPI}
 \label{subsec:openmpi}
 OpenMPI è un'implementazione open source di MPI (\ref{subsec:mpi}).
@@ -29,3 +31,53 @@ Di seguito verranno esposte le primitive più importanti della libreria.
 \item MPI\_Pack e MPI\_Unpack: Impacchettano e spacchettano dati da spedire.
 \end{itemize}
 %Continuare
+
+\subsection{OPENMP}
+\label{subsec:openmp}
+A differernza di OPENMPI, OPENMP è una libreria per lo sviluppo di applicazioni parallele 
+in sistemi a memoria condivisa, nel nostro caso per processi multithread che lavoreranno su cpu
+multicore.
+Per specificare quali parti del codice debbano essere splittate sui core senza race condition, viene usata la direttiva \#pragma omp parallel, per indicare una sezione critica invece viene utilizzata la direttiva \#pragma omp critical
+
+Le funzioni principali sono elencate di seguito:
+\begin{itemize}
+\item omp\_get\_num\_procs: Restituisce il numero di processori disponibili quando viene chiamata la funzione. 
+\item omp\_get\_num\_threads: Restituisce il numero di thread nell'area parallela.
+\item omp\_get\_wtime: Restituisce un valore in secondi del tempo trascorso da un certo punto. 
+\end{itemize}
+
+\subsection{GMP}
+\label{subsec:gmp}
+GMP \'{e} una libreria libera per l'utilizzo di aritmetica a precizione arbitraria e fa parte
+del progetto GNU $($ Gnu Multile Precision $)$.
+L'unica limitazione alla dimensione dei valori assumibili da una variabile mpz è la dimensione della
+memoria del dispositivo.
+GMP viene utilizzata per algoritmi crittografici, applicazioni relative alla sicurezza delle reti
+e per sistemi di algebra numerica.
+Internamente GMP rappresenta gli interi come dei vettori.
+L'utilizzo di questa libreria all'interno dell'algoritmo è stato necessario sia per la rappresentazione
+dell'intero da fattorizzare e per i suoi fattori primi, se pensiamo che RSA utilizza numeri con più
+di 100 cifre viene normale utilizzare rappresentazioni in precisione arbitraria, che per gli esponenti
+all'interno delle fattorizzazioni: per quanto potesse sembrare poco probabile si è notato che gli esponenti 
+nelle fattorizzazioni raggiungono dimensioni elevate, si è quindi dimostrato necessario utilizzare variabili
+mpz per rappresentare anche questi.
+
+Di seguito verranno esposte le primitive più importanti della libreria.
+\begin{itemize}
+\item gmp\_init: Questa funzione va chiamata ad ogni dichiarazione per inizializzare la variabile
+\item gmp\_add: Somma due mpz
+\item gmp\_sub: Sottrae due mpz
+\item gmp\_mul: Moltiplica due mpz
+\item gmp\_div: Divide due mpz
+\item gmp\_mod: Calcola il resto della divisione intera tra due mpz
+\item gmp\_legendre: Calcola il valore del simbolo di Legendre
+\item gmp\_sqrt: Radice quadrata
+\item gmp\_pow: Potenza
+\item gmp\_gcd: Massimo Comun Divisore
+\item gmp\_func\_ui: specificando \_ui indichiamo che il secondo parametro è un intero senza segno
+\end{itemize}
+
+
+
+
+\end{fushleft}
