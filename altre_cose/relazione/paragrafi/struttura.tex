@@ -1,0 +1,82 @@
+%************************************************
+\section{Struttura del programma}
+\label{sec:struttura}
+%************************************************
+\subsection{Suddivisione dei sorgenti}
+L'implementazione del crivello quadratico proposto si suddivide in due
+versioni: seriale e parallelo.
+Entrambe le versioni hanno una struttura dei sorgenti simile.
+Ogni file contiene funzioni che occorrono in una determinata fase del
+crivello. La directory dei sorgenti è "/src". Il programma è
+suddiviso in 7 file:
+
+\begin{itemize}
+\item \texttt{base\char`_fattori.c}
+\item \texttt{eratostene.c}
+\item \texttt{linear\char`_algebra.c}
+\item \texttt{quadratic\char`_sieve.c}
+\item \texttt{trivial\char`_fact.c}
+\item \texttt{vector.c}
+\item \texttt{matrix.c}
+\end{itemize}
+
+Il file \texttt{base\char`_fattori.c} contiene le funzioni per il
+calcolo della base di fattori. Il file \texttt{eratostene.c} contiene
+la funzione per il calcolo dei primi $n$ numeri primi mediante il
+crivello di Eratostene. In \texttt{linear\char`_algebra.c} sono
+contenute  le funzioni per l'eliminazione gaussiana, eseguita sulla
+matrice degli esponenti. Nello stesso file sono presenti anche le
+funzioni che permettono il calcolo delle congruenze nella parte
+finale dell'algoritmo. \texttt{quadratic\char`_sieve.c} è il file
+principale del programma. Da questo vengono richiamate 
+le funzione che eseguono le varie fasi
+dell'algoritmo. \texttt{trivial\char`_fact.c} è il file con le
+funzioni che effettuano la fattorizzazione per tentativi necessarie
+nella parte iniziale dell'algoritmo. \texttt{vector.c} e
+\texttt{matrix.c} contengono funzioni di servizio per la
+gestione delle strutture dati utilizzati. \texttt{vector.c} gestisce
+la struttura dati vettore dinamico istanziata per vari tipi di dato:
+\texttt{unsigned int}, \texttt{unsigned long} e \texttt{mpz\char`_t}. 
+\texttt{matrix.c} gestisce matrici di dimensione dinamica in entrambe le
+dimensioni. Come per i vettori è presente la variante \texttt{unsigned
+int}, \texttt{unsigned long} e \texttt{mpz\char`_t}.
+Sono presenti header file per ognuno dei sorgenti c nella directory 
+"/include".
+\subsection{Compilazione}
+Per la compilazione del codice sono presenti tre makefile.
+Il primo, chiamato semplicemente "Makefile", occorre per compilare
+generalmente il codice per un pc linux. Un avvertenza: è necessario
+creare le directory "lib" ed "executables" nella cartella principale
+dell'algoritmo (es: parallel/executables). Queste cartelle conterranno i
+prodotti della compilazione, executables per gli eseguibili e lib per
+gli object file.
+Gli ulteriori makefile, Makefile.intel e Makefile.gnu, sono stati
+utilizzati per la compilazione del codice sul Galileo utilizzando
+il compilatore mpi di intel e gnu.
+\subsection{Esecuzione del programma parallelo}
+Il main del programma (che è da considerare puramente
+a scopo di debugging e non main di un applicazione definitiva)
+ha la seguente interfaccia a linea di comando:
+\begin{lstlisting}[language=bash]
+  $ mpirun [opzioni_mpi] executables/qs [n1] [n2] [dim_crivello_eratostene] [dim_intervallo] [dim_blocco]
+\end{lstlisting}
+\begin{itemize}
+\item[\texttt{n1}, \texttt{n2}] A scopo di debugging l'applicazione prende
+in input due numeri che moltiplica tra loro producendo il numero $N$
+da fattorizzare. Porre uno dei due numeri a 1 per inserire
+direttamente l'$N$ da fattorizzare;
+\item[\texttt{dim\char`_crivello\char`_eratostene}] Per calcolare la
+base di fattori si calcolano prima i numeri primi da  
+0 a \texttt{dim\char`_crivello\char`_eratostene} (nota: la base di fattori sarà molto più
+piccola di questo parametro);
+\item[\texttt{dim\char`_intervallo}] dimensione insieme di A per i queali ogni salve
+fattorizza i rispettivi $Q(A)$; 
+\item[\texttt{dim\char`_blocco}] Dato un intervallo ad uno slave questo lo separa in
+altri sottointervalli che assegna ad ogni thread. Ogni thread calcola
+alla volta \texttt{dim\char`_blocco} valori di $A$;
+\item[\texttt{fact\char`_print}] Parametro che indica ogni quante fattorizzazioni trovate, il programma produce un
+output su stdout per mostrare la percentuale di completamento.
+\end{itemize}
+\begin{lstlisting}[language=bash]
+$ mpirun executables/qs-intel 1 18567078082619935259 4000 10000000 10 1000 50
+\end{lstlisting}

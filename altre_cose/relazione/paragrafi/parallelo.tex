@@ -16,12 +16,12 @@ questi dati.
 \subsection{Il ruolo del nodo master}
 Il nodo master entra in una procedura che colleziona i risultati
 provenienti dagli slave durante la fase di crivello. Ricordiamo che in
-questa parte si deve ricercare per quali valori di A il polinomio Q(A)
+questa parte si deve ricercare per quali valori di $A$ il polinomio $Q(A)$
 si fattorizza completamente sulla base di fattori. I nodi effettuano
-dunque le fattorizzazioni sui vari valori di A in simultanea ed
-inviano il vettore degli esponenti e il vettori con i (A + s)
-calcolati. Sono necessarie K+10 fattorizzazioni per proseguire
-nell'algoritmo (dove K è la dimensione della base di fattori) dunque
+dunque le fattorizzazioni in simultanea ed
+inviano il vettore degli esponenti e il vettori con i $(A + s)$
+calcolati. Sono necessarie $K+10$ fattorizzazioni per proseguire
+nell'algoritmo (dove $K$ è la dimensione della base di fattori) dunque
 una volta collezionato tale numero di risultati, il master interrompe
 l'ascolto dei messaggi MPI in arrivo dagli slave ed invia un segnale
 di stop a tutti indicando di concludere la procedura di crivello.
@@ -55,13 +55,14 @@ while(fact_count < max_fact + base_dim) {
 \end{lstlisting}
 Sono presenti due tag per le chiamte a \texttt{MPI\char`_Recv} per forzare la
 ricezione in sequenza di un vettore di esponenti, il \texttt{ROW\char`_TAG}, ed un
-vettore di (A + s), \texttt{l'AS\char`_TAG}. Viene estratto l'id del mittente dalla
+vettore di $(A + s)$, l'\texttt{AS\char`_TAG}. Viene estratto l'id del mittente dalla
 ricezione del vettore degli esponenti. Questo è necessario per
-prelevare il vettore degli (A + s) relativo agli stessi dati. Altri
-vettori (A + s) potrebbero essere giunti primi nella coda di ricezione
-da altri slave diversi rispetto a quello di cui stiamo considerando il
-vettore degli esponenti. \'E fondamentale l'associazione vettore
-esponenti e vettore (A + s).
+prelevare il vettore degli $(A + s)$ relativo agli stessi dati. Altri
+vettori $(A + s)$ inviati da altri slave potrebbero essere giunti
+prima nella coda di ricezione rispetto ai messaggi dello slave
+di cui stiamo considerando il vettore degli esponenti. \'E
+fondamentale l'associazione vettore 
+esponenti e vettore $(A + s)$.
 
 Sorge tuttavia una problematica di uso efficiente delle risorse. Il
 nodo master resta in attesa delle fattorizzazioni durante la fase di
@@ -71,10 +72,10 @@ inattivo per la maggior parte del tempo. Una soluzione a questo
 problema che non preveda alcuna modifica al codice è la seguente:
 si lanciano i processi mpi e si istruisce il gestore delle code
 (qualora preveda questa opzione)  di attivare un singolo processo 
-per nodo ad eccezione del master. Su questo infatti sarà lanciato un
+per nodo ad eccezione del master. Su questo sarà infatti lanciato un
 secondo processo mpi che occuperà i tempi di inattvità della cpu
 dovuti al primo processo in attesa, ricercando anch'esso
-fattorizzazioni per i Q(A). Nell'implementazione dell'algoritmo
+fattorizzazioni per i $Q(A)$. Nell'implementazione dell'algoritmo
 proposta, questa soluzione non è
 attuabile con  successo poichè \texttt{MPI\char`_Recv} effettua un attesa attiva
 consumando comunque il 100\% della risorsa cpu. Si potrebbe sostituire
@@ -84,23 +85,23 @@ attiva, avvenga con frequenza inferiore.
 \subsection{Il ruolo dei nodi slave}
 Il crivello è la parte più onerosa di tutto l'algoritmo. Viene
 richiesto di provare svariati valori di A per tentare di fattorizzare
-completamente il polinomio Q(A) calcolato. Possiamo considerare un
-dominio di valore di A che è l'intervallo [0, M] e decomporlo in
+completamente il polinomio $Q(A)$ calcolato. Possiamo considerare un
+dominio di valore di $A$ che è l'intervallo $[0, M]$ e decomporlo in
 tante parti quanti sono i nodi slave del cluster. Lo slave i-mo
-effettuerà i calcoli parallelamente agli altri sui valori di A in [Bi, Fi].
-Si calcola il polinomio Q(A), si cerca di fattorizzarlo sulla base di
+effettuerà i calcoli parallelamente agli altri sui valori di $A$ in $[B_i, F_i]$.
+Si calcola il polinomio $Q(A)$, si cerca di fattorizzarlo sulla base di
 fattori. Nella versione seriale dalla procedura di crivello, si
 ritornavano due strutture dati contenenti i vettori degli esponenti
-delle fattorizzazioni e il vettore degli (A + s). Nella versione
+delle fattorizzazioni e il vettore degli $(A + s)$. Nella versione
 parallela memorizzeremo temporaneamente queste "soluzioni" per poi
 inviarle al master, tramite MPI, ogni volta che si saranno tentati n valori
-di A. Il comportamento della funzione di crivello parallelo è identico
+di $A$. Il comportamento della funzione di crivello parallelo è identico
 alla controparte parallela con la differenza che anzichè salvare i risutlati
 in una struttura dati si inviano mediante il protocollo MPI al nodo master.
 
 L'architettura del nostro sistema è però ibrida: abbiamo svariati
 processi MPI al cui interno girano svariati thread. Analizzeremo più nel
-dettaglio come sarà decomposto il dominio dei valori di A per
+dettaglio come sarà decomposto il dominio dei valori di $A$ per
 assegnare un pezzo a ciascun processo e, al loro interno, a ciascun
 thread.
 \subsection{Decomposizione del dominio}
@@ -116,13 +117,13 @@ do {
 } while(!stop_flag);
 \end{lstlisting}
 Supponiamo di considerare lo slave i-mo. Il rank di tale slave sarà
-i+1 (per via della presenza del master). Il parametro "interval"
-rappresenta il blocco di valori di A che ogni slave utilizza alla
+$i+1$ (per via della presenza del master). Il parametro "interval"
+rappresenta il blocco di valori di $A$ che ogni slave utilizza alla
 volta. Lo slave i-mo inizialmente autodetermina in base al suo
 rank l'intervallo sul quale deve operare assegnando alla variabile
-"begin" il valore "interval * i" (si ricorda che rank = i + 1).
-La funzione \texttt{smart\char`_sieve} operà dunque sull'intervallo [begin, begin +
-  interval]. Se nessun segnale di stop è arrivato dal master lui
+"begin" il valore "interval * i" (si ricorda che $rank = i + 1$).
+La funzione \texttt{smart\char`_sieve} opera dunque sull'intervallo $[begin, begin +
+  interval]$. Se nessun segnale di stop è arrivato dal master lui
 autodetermina l'intervallo successivo da esaminare tenendo conto della
 presenza degli altri nodi facendo \texttt{begin = begin + (interval *
 comm\char`_size - 1)}. La variabile \texttt{comm\char`_size} contiene la dimensione del
