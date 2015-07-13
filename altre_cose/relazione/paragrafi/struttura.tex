@@ -1,15 +1,18 @@
 %************************************************
-\section{Struttura del programma}
+\section{Struttura della repository}
 \label{sec:struttura}
 %************************************************
-\subsection{Suddivisione dei sorgenti}
 L'implementazione del crivello quadratico proposto si suddivide in due
-versioni: seriale e parallelo.
-Entrambe le versioni hanno una struttura dei sorgenti simile.
+versioni: seriale e parallelo. Nella directory \texttt{/serial} è contenuto
+il codice dell'algoritmo seriale mentre in \texttt{/parallel} la versione
+parallela. Nel capitolo sarà trattata dettagliatamente la versione
+parallela dell'algoritmo parlando di come di compila ed esegue su un
+cluster di computer.
+\subsection{Suddivisione dei sorgenti}
+Entrambe le versioni, seriale e parallela, hanno una struttura dei sorgenti simile.
 Ogni file contiene funzioni che occorrono in una determinata fase del
-crivello. La directory dei sorgenti è "/src". Il programma è
+crivello. La directory dei sorgenti è \texttt{/src}. Il programma è
 suddiviso in 7 file:
-
 \begin{itemize}
 \item \texttt{base\char`_fattori.c}
 \item \texttt{eratostene.c}
@@ -19,7 +22,6 @@ suddiviso in 7 file:
 \item \texttt{vector.c}
 \item \texttt{matrix.c}
 \end{itemize}
-
 Il file \texttt{base\char`_fattori.c} contiene le funzioni per il
 calcolo della base di fattori. Il file \texttt{eratostene.c} contiene
 la funzione per il calcolo dei primi $n$ numeri primi mediante il
@@ -41,16 +43,16 @@ la struttura dati vettore dinamico istanziata per vari tipi di dato:
 dimensioni. Come per i vettori è presente la variante \texttt{unsigned
 int}, \texttt{unsigned long} e \texttt{mpz\char`_t}.
 Sono presenti header file per ognuno dei sorgenti c nella directory 
-"/include".
+\texttt{/include}.
 \subsection{Compilazione}
 Per la compilazione del codice sono presenti tre makefile.
-Il primo, chiamato semplicemente "Makefile", occorre per compilare
+Il primo, chiamato semplicemente ``Makefile'', occorre per compilare
 generalmente il codice per un pc linux. Un avvertenza: è necessario
-creare le directory "lib" ed "executables" nella cartella principale
-dell'algoritmo (es: parallel/executables). Queste cartelle conterranno i
+creare le directory \texttt{/lib} ed \texttt{/executables} nella cartella principale
+dell'algoritmo (es: \texttt{/parallel/executables}). Queste cartelle conterranno i
 prodotti della compilazione, executables per gli eseguibili e lib per
 gli object file.
-Gli ulteriori makefile, Makefile.intel e Makefile.gnu, sono stati
+Gli ulteriori makefile, ``Makefile.intel'' e ``Makefile.gnu'', sono stati
 utilizzati per la compilazione del codice sul Galileo utilizzando
 il compilatore mpi di intel e gnu.
 \subsection{Esecuzione del programma parallelo}
@@ -58,25 +60,77 @@ Il main del programma (che è da considerare puramente
 a scopo di debugging e non main di un applicazione definitiva)
 ha la seguente interfaccia a linea di comando:
 \begin{lstlisting}[language=bash]
-  $ mpirun [opzioni_mpi] executables/qs [n1] [n2] [dim_crivello_eratostene] [dim_intervallo] [dim_blocco]
+  $ mpirun [opzioni_mpi] executables/qs [n1] [n2] [crivello] [intervallo] [blocco]
 \end{lstlisting}
 \begin{itemize}
 \item[\texttt{n1}, \texttt{n2}] A scopo di debugging l'applicazione prende
 in input due numeri che moltiplica tra loro producendo il numero $N$
 da fattorizzare. Porre uno dei due numeri a 1 per inserire
 direttamente l'$N$ da fattorizzare;
-\item[\texttt{dim\char`_crivello\char`_eratostene}] Per calcolare la
+\item[\texttt{crivello}] Per calcolare la
 base di fattori si calcolano prima i numeri primi da  
-0 a \texttt{dim\char`_crivello\char`_eratostene} (nota: la base di fattori sarà molto più
-piccola di questo parametro);
-\item[\texttt{dim\char`_intervallo}] dimensione insieme di A per i queali ogni salve
-fattorizza i rispettivi $Q(A)$; 
-\item[\texttt{dim\char`_blocco}] Dato un intervallo ad uno slave questo lo separa in
+0 a \texttt{crivello} mediante il crivello di eratostene (nota: la
+base di fattori sarà molto più piccola di questo parametro);
+\item[\texttt{intervallo}] Dimensione dell'insieme insieme degli $A$
+per i queali ogni salve fattorizza i rispettivi $Q(A)$; 
+\item[\texttt{blocco}] Dato un intervallo ad uno slave questo lo separa in
 altri sottointervalli che assegna ad ogni thread. Ogni thread calcola
-alla volta \texttt{dim\char`_blocco} valori di $A$;
+alla volta \texttt{blocco} valori di $A$;
 \item[\texttt{fact\char`_print}] Parametro che indica ogni quante fattorizzazioni trovate, il programma produce un
 output su stdout per mostrare la percentuale di completamento.
 \end{itemize}
 \begin{lstlisting}[language=bash]
-$ mpirun executables/qs-intel 1 18567078082619935259 4000 10000000 10 1000 50
+$ mpirun -np 4 executables/qs-intel 1 18567078082619935259 4000 10000000 10 1000 50
 \end{lstlisting}
+\subsection{Galileo}
+L'esecuzione dell'algortimo è avvenuto principalmente su due diversi
+sistemi: il cluster del dipartimento di fisica dell'Università di
+Parma e il supercumputer Galileo presente al Cineca
+(http://www.hpc.cineca.it/hardware/galileo). Riportiamo di seguito le
+specifiche tecniche del sistema prese direttamente dal sito web del
+cineca:
+\\
+\\
+\begin{tabular}{l l}
+Modello: & IBM NeXtScale \\
+Architettura: & Linux Infiniband Cluster \\
+Nodi: & 516 \\
+Processori: & 2 8-cores Intel Haswell 2.40 GHz per node \\
+Cores: & 16 cores/node, 8256 cores in total \\
+Acceleratori grafici: & 2 Intel Phi 7120p per node on 384 nodes (768
+in total); \\
+                      & 2 NVIDIA K80 per node on 40 nodes \\
+RAM: & 128 GB/node, 8 GB/core \\
+Internal Network: & Infiniband with 4x QDR switches \\
+Disk Space: & 2.000 TB of local scratch \\
+Peak Performance: & 1.000 TFlop/s (da definire) \\
+Sistema Operativo: & CentOS 7.0 \\
+\end{tabular}
+\subsection{Esecuzione e gestore delle code}
+Qui riportata una sezione dello script (\texttt{script.sh}) per la sottomissione dei job sul Galileo.
+La sottomissione avviene mediante il comando \texttt{qsub script.sh}. Per ulteriori informazioni
+sul gestore delle code utilizzato nel Galileo si rimanda al sito del
+cineca.
+\begin{lstlisting}[language=bash]
+#PBS -A INFNG_test 
+#PBS -l select=1:ncpus=16:mem=100gb:mpiprocs=2+7:ncpus=16:mem=100gb:mpiprocs=1 
+#PBS -l walltime=24:00:00 
+#PBS -N CCQi-n8-65l
+name="CCQi-n8-65l"
+
+cat $PBS_NODEFILE
+
+module load intel intelmpi
+\end{lstlisting}
+Queste riportate sono direttive per il gestore delle code. Notare il
+comando \texttt{module load intel intelmpi} che consente di utilizzare il 
+compilatore mpi di intel. 
+\begin{lstlisting}[language=bash]
+#PBS -l select=1:ncpus=16:mem=100gb:mpiprocs=2+7:ncpus=16:mem=100gb:mpiprocs=1 
+\end{lstlisting}
+Vediamo nel dettaglio la direttiva per l'ottenimento delle risorse
+richieste. Ricordiamo che sul nodo master vogliamo l'esecuzione di due processi
+MPI. Per fare questo richiediamo un nodo solo (\texttt{select=1:ncpus=16:mem=100gb:mpiprocs=2)} con 16 core, sul quale richiediamo
+due processi MPI. Il simbolo ``+'' nella stringa serve per specificare ulteriori risorse da richiedere infatti
+con \texttt{7:ncpus=16:mem=100gb:mpiprocs=1} stiamo richiedendo 7
+nodi, 16 core ognuno e un solo processo MPI per nodo.
