@@ -3,7 +3,7 @@
 \label{sec:tecnologie}
 %************************************************
 
-\begin{fushleft}
+\begin{flushleft}
 
 \subsection{OpenMPI}
 \label{subsec:openmpi}
@@ -58,8 +58,7 @@ Internamente GMP rappresenta gli interi come dei vettori.
 L'utilizzo di questa libreria all'interno dell'algoritmo è stato necessario sia per la rappresentazione
 dell'intero da fattorizzare e per i suoi fattori primi, se pensiamo che RSA utilizza numeri con più
 di 100 cifre viene normale utilizzare rappresentazioni in precisione arbitraria, che per gli esponenti
-all'interno delle fattorizzazioni: per quanto potesse sembrare poco probabile si è notato che gli esponenti 
-nelle fattorizzazioni raggiungono dimensioni elevate, si è quindi dimostrato necessario utilizzare variabili
+all'interno delle fattorizzazioni: per quanto potesse sembrare poco probabile si è notato che durante la fase di eliminazione di Gauss gli esponenti nelle fattorizzazioni raggiungono dimensioni elevate, si è quindi dimostrato necessario utilizzare variabili
 mpz per rappresentare anche questi.
 
 Di seguito verranno esposte le primitive più importanti della libreria.
@@ -80,4 +79,4 @@ Di seguito verranno esposte le primitive più importanti della libreria.
 
 
 
-\end{fushleft}
+\end{flushleft}
