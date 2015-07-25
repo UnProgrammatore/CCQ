@@ -4,12 +4,13 @@
 %************************************************
 Descriveremo l'architettura parallela dell'algoritmo.
 \subsection{Base di fattori}
-Il nodo master potrebbe ricercare la base di fattori ed inviare il
-vettore di primi validi ai restanti nodi slave del cluster. Siccome
-gli slave resterebbero inattivi fino alla ricezione della base, in
-questa implementazione parallela si è deciso di far determinare la
-base di fattori ad ogni nodo indipendentemente. Tutti i nodi
-impiegheranno un tempo circa uguale per determinarla e inizieranno
+La prima parte dell'algoritmo consiste nella ricerca di una base di
+fattori opportuna. Il nodo master potrebbe ricercare la base ed inviare il
+vettore di primi che la compongono ai restanti nodi slave del
+cluster. Siccome gli slave resterebbero inattivi fino alla ricezione
+della base, in questa implementazione parallela si è deciso di far
+determinare la base di fattori ad ogni nodo indipendentemente. Tutti i
+nodi impiegheranno un tempo circa uguale per determinarla e inizieranno
 subito la parte successiva dell'algoritmo evitando il trasferimento di
 questi dati.
 \subsection{Il ruolo del nodo master}
@@ -18,8 +19,8 @@ provenienti dagli slave durante la fase di crivello. Ricordiamo che in
 questa parte si deve ricercare per quali valori di $A$ il polinomio $Q(A)$
 si fattorizza completamente sulla base di fattori. I nodi effettuano
 dunque le fattorizzazioni in simultanea ed
-inviano il vettore degli esponenti e il vettori con i $(A + s)$
-calcolati. Sono necessarie $K+10$ fattorizzazioni per proseguire
+inviano il vettore degli esponenti e il vettori degli $(A + s)$
+ricavati. Sono necessarie $K+10$ fattorizzazioni per proseguire
 nell'algoritmo (dove $K$ è la dimensione della base di fattori) dunque
 una volta collezionato tale numero di risultati, il master interrompe
 l'ascolto dei messaggi MPI in arrivo dagli slave ed invia un segnale
@@ -64,13 +65,13 @@ fondamentale l'associazione vettore
 esponenti e vettore $(A + s)$.
 
 Sorge tuttavia una problematica di uso efficiente delle risorse. Il
-nodo master resta in attesa delle fattorizzazioni durante la fase di
-crivello, queste fattorizzazione - per numeri sufficientemente grossi
-- sono più "rarefatte", lasciando quindi il processore del nodo
+nodo master resta in attesa delle fattorizzazioni durante tutta la fase di
+crivello, per numeri sufficientemente grossi i polinomi $Q(A)$ che si
+fattorizzano completamente sono più "rari", lasciando quindi il processore del nodo
 inattivo per la maggior parte del tempo. Una soluzione a questo
 problema che non preveda alcuna modifica al codice è la seguente:
 si lanciano i processi mpi e si istruisce il gestore delle code
-(qualora preveda questa opzione)  di attivare un singolo processo 
+del cluster ad attivare un singolo processo 
 per nodo ad eccezione del master. Su questo sarà infatti lanciato un
 secondo processo mpi che occuperà i tempi di inattvità della cpu
 dovuti al primo processo in attesa, ricercando anch'esso
@@ -83,22 +84,21 @@ per un lasso di tempo fissato forzando un attessa che, seppur sempre
 attiva, avvenga con frequenza inferiore.
 \subsection{Il ruolo dei nodi slave}
 Il crivello è la parte più onerosa di tutto l'algoritmo. Viene
-richiesto di provare svariati valori di A per tentare di fattorizzare
-completamente il polinomio $Q(A)$ calcolato. Possiamo considerare un
-dominio di valore di $A$ che è l'intervallo $[0, M]$ e decomporlo in
+richiesto di provare svariati valori di $A$ per tentare di fattorizzare
+completamente il polinomio $Q(A)$ calcolato. Consideriamo un
+insieme di valore di $A$ che è l'intervallo $[0, M]$ e decomponiamolo in
 tante parti quanti sono i nodi slave del cluster. Lo slave i-mo
-effettuerà i calcoli parallelamente agli altri sui valori di $A$ in $[B_i, F_i]$.
-Si calcola il polinomio $Q(A)$, si cerca di fattorizzarlo sulla base di
-fattori. Nella versione seriale dalla procedura di crivello, si
+effettuerà i calcoli sui valori di $A$ nell'intervallo
+$[B_i, F_i]$ grande $M/\mathrm{n\char`_slaves}$. 
+Nella versione seriale dalla procedura di crivello, si 
 ritornavano due strutture dati contenenti i vettori degli esponenti
 delle fattorizzazioni e il vettore degli $(A + s)$. Nella versione
 parallela memorizzeremo temporaneamente queste "soluzioni" per poi
-inviarle al master, tramite MPI, ogni volta che si saranno tentati n valori
+inviarle al master, tramite MPI, ogni volta che si saranno tentati $n$ valori
 di $A$. Il comportamento della funzione di crivello parallelo è identico
 alla controparte parallela con la differenza che anzichè salvare i risutlati
-in una struttura dati si inviano mediante il protocollo MPI al nodo master.
-
-L'architettura del nostro sistema è però ibrida: abbiamo svariati
+in una struttura dati si inviano mediante il protocollo MPI al nodo
+master. L'architettura del nostro sistema è però ibrida: abbiamo svariati
 processi MPI al cui interno girano svariati thread. Analizzeremo più nel
 dettaglio come sarà decomposto il dominio dei valori di $A$ per
 assegnare un pezzo a ciascun processo e, al loro interno, a ciascun
