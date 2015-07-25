@@ -4,137 +4,37 @@
 %************************************************
 
 
-I risultati che abbiamo non sono ancora ottimali per evincere conclusioni precise in merito alle prestazioni ed allo speed-up.
+I risultati che abbiamo non sono ancora ottimali per trarre conclusioni precise in merito alle prestazioni ed allo speed-up.
 Per ora siamo riusciti a fattorizzare numeri sotto le 50 cifre su un numero massimo di nodi pari a 8, i numeri con una quantità superiore di cifre hanno causato l'uccisione del processo dal gestore di code di Galileo, il supercomputer su cui abbiamo eseguito i calcoli, a tal proposito si vedano gli sviluppo futuri per quest'algoritmo nell'ottica di creare un sistema di checkpoint per non perdere il calcolo fatto qualora si eccedesse il tempo a propria disposizione. \\
+Verranno presentati di seguito alcuni dei risultati significativi.\\ \\
 
+\emph{Fattorizzazione di un numero a 30 cifre} \\ \\
+\begin{tabular}{|r|ll|r|} 
+Numero di processori & Tempo crivello & Tempo eliminazione di Gauss & Tempo totale \\
+2 & 2.357121 & 3.806429 & 6.367990 \\
+4 & 1.891235 & 3.797348 & 5.896448 \\
+8 & 1.923282 & 1.788766 & 3.935302
+\end{tabular}
+\\ \\ \\
 
+\emph{Fattorizzazione di un numero a 40 cifre} \\ \\
+\begin{tabular}{|r|ll|r|} 
+Numero di processori & Tempo crivello & Tempo eliminazione di Gauss & Tempo totale \\
+2 & 320.353972 & 250.406708 & 573.848776 \\
+4 & 202.583528 & 276.894561 & 482.333897
+\end{tabular}
+\\ \\ \\
 
-\begin{}
-#CCQg-n2-30
-#time_base time_sieve time_gauss time_totale
-0.204440 2.357121 3.806429 6.367990  
+\emph{Fattorizzazione di un numero a 50 cifre} \\ \\
+\begin{tabular}{|r|ll|r|} 
+Numero di processori & Tempo crivello & Tempo eliminazione di Gauss & Tempo totale \\
+4 & 7683.857860 & 5171.678976 & 12884.067465 \\
+8 & 3956.152933 & 5621.893790 & 9603.754040
+\end{tabular}
+\\ \\ \\
 
-#CCQg-n4-30
-#time_base time_sieve time_gauss time_totale
-0.207865 1.891235 3.797348 5.896448 
-
-#CCQg-n8-30
-#time_base time_sieve time_gauss time_totale
-0.223254 1.923282 1.788766 3.935302 
-\end{}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Numero fattorizzazioni complete trovate: 540
-#time_base time_sieve time_gauss time_totale
-0.204832 1.589171 1.309165 3.103168 4 30
-
-#CCQi-n4-40
-#Numero fattorizzazioni complete trovate: 2153
-#time_base time_sieve time_gauss time_totale
-2.937254 194.083372 220.288502 417.309128 4 40
-
-# CCQi-n8-45
-#Numero fattorizzazioni complete trovate: 3079
-#time_base time_sieve time_gauss time_totale
-6.649964 813.154146 609.427356 1429.231466 8 45
-
-#CCQi-n4-45l
-#Numero fattorizzazioni complete trovate: 3079
-#time_base time_sieve time_gauss time_totale
-7.454221 1587.917412 693.236949 2288.608582 4 45
-
-#CCQi-n4-50l
-#Numero fattorizzazioni complete trovate: 5640
-#time_base time_sieve time_gauss time_totale
-29.539861 7530.368473 6922.046000 14481.954334 4 50
-
-# CCQi-n12-50
-#timelimit 1
-
-#CCQi-n4-55l
-# Jul 12 06:10:54 CEST 2015
-# Jul 13 01:31
-#Fattorizzazioni per ranks:
-#1      2       3       4
-#2148   2033    2038    1967
-#Numero fattorizzazioni complete trovate: 8186
-#killed
-
-# CCQi-n8-55l
-# Jul 12 01:28:34 CEST 2015
-# Jul 12 12:29
-#1164   1044    1081    1037    985     993     956     926
-#Numero fattorizzazioni complete trovate: 8186
-#killed
-
-#CCQi-n8-60l
-walltime 86502 exceeded limit 86400
-
-# CCQi-n12-65l
-# walltime 86502 exceeded limit 86400
-
-
-#CCQg-n2-30
-#Numero fattorizzazioni complete trovate: 540
-#time_base time_sieve time_gauss time_totale
-0.204440 2.357121 3.806429 6.367990  2 30
-
-#CCQg-n4-30
-#Numero fattorizzazioni complete trovate: 540
-#time_base time_sieve time_gauss time_totale
-0.207865 1.891235 3.797348 5.896448 4 30
-
-#CCQg-n8-30
-#Numero fattorizzazioni complete trovate: 540
-#time_base time_sieve time_gauss time_totale
-0.223254 1.923282 1.788766 3.935302 8 30
-
-#CCQg-n2-40
-#Numero fattorizzazioni complete trovate: 2153
-#time_base time_sieve time_gauss time_totale
-3.088096 320.353972 250.406708 573.848776 2 40
-
-#CCQg-n4-40
-#Numero fattorizzazioni complete trovate: 2153
-#time_base time_sieve time_gauss time_totale
-2.855808 202.583528 276.894561 482.333897 4 40
-
-#CCQg-n4-45
-#exceeded limit 1800
-
-#CCQg-n8-45
-#exceeded limit 1800
-
-#CCQg-n12-45
-#Numero fattorizzazioni complete trovate: 3079
-#time_base time_sieve time_gauss time_totale
-6.327680 641.358716 831.867090 1479.553486 12 45
-
-
-#CCQg-n4-50l
-#Numero fattorizzazioni complete trovate: 5640
-#time_base time_sieve time_gauss time_totale
-28.530629 7683.857860 5171.678976 12884.067465 4 50
-
-
-#CCQg-n8-50l
-#Numero fattorizzazioni complete trovate: 5640
-#time_base time_sieve time_gauss time_totale
-25.707317 3956.152933 5621.893790 9603.754040 8 50
-
-
-
-
-
+Per valutare lo speed-up dell'algoritmo verranno presi in considerazione i tempi del crivello, la parte parallelizzata (e l'unica parallelizzabile) dell'algoritmo.
+Notiamo che nel caso del numero di 30 cifre non vi è un vero e proprio speed-up lineare, abbiamo anzi un aumento dei tempi di crivello. Questo è attribuibile al fatto che, con un numero così piccolo per l'algoritmo, l'overhead generato dall'aumento del numero di nodi anche ridotto è sufficiente a vanificare i miglioramenti ottenuti dall'aumento del potenziale di calcolo.
+Nel caso del numero a 40 cifre possiamo apprezzare uno speed-up leggermente migliore.
+Infine, nel caso del numero a 50 cifre, lo speed-up ottenuto è quasi lineare.
+Infatti, all'aumentare del numero di cifre, l'overhead dovuto all'aumentare del numero dei nodi viene meglio ammortizzato.
